@@ -390,30 +390,6 @@
             padding: 7px 12px; cursor: default;
         }
 
-        /* ====================================================================
-           "NEXT UP" RAIL
-           ==================================================================== */
-        .next-up { margin-top: 16px; }
-        .next-up .heading {
-            font-size: 11px; color: var(--text-dim); letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        .next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .next-card {
-            border: 1px solid var(--line); border-radius: 7px; overflow: hidden;
-            background: var(--panel-2); cursor: default;
-        }
-        .next-thumb {
-            position: relative; aspect-ratio: 16/9; overflow: hidden; background: #000;
-        }
-        .next-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
-        .next-thumb .live-tag {
-            position: absolute; top: 5px; left: 5px;
-            background: var(--live); color: #fff; font-size: 8px; font-weight: 700;
-            letter-spacing: 1px; padding: 1px 4px; border-radius: 2px;
-        }
-        .next-card .next-title { font-size: 11px; color: var(--text); padding: 7px 8px 3px; line-height: 1.35; }
-        .next-card .next-meta  { font-size: 10px; color: var(--text-dim); padding: 0 8px 8px; }
 
         /* ====================================================================
            TOASTS (achievements — dry one-liners)
@@ -461,7 +437,6 @@
             .app { flex-direction: column; }
             .chat { flex-basis: auto; }
             .chat-body { min-height: 200px; max-height: 260px; }
-            .next-grid { grid-template-columns: 1fr; }
         }
 
         /* ---- Respect reduced-motion: calm the flicker/scanlines/spin ---- */
@@ -591,11 +566,6 @@
                 </div>
             </div>
 
-            <!-- NEXT UP rail -->
-            <div class="next-up">
-                <div class="heading">NEXT UP — RECOMMENDED FOR YOU</div>
-                <div class="next-grid" id="nextGrid"></div>
-            </div>
         </div>
 
         <!-- ----------------------- CHAT -------------------------- -->
@@ -670,6 +640,115 @@
         "anyone else here", "yeah", "what are we doing here", "living the dream",
         "the lighting is doing a lot of work", "subscribed", "this is fine",
         "i could watch this for hours. i have.", "any minute now",
+        "the anticipation is killing me", "not me personally", "it's a chair",
+        "chair shaped object confirmed", "still a chair, still empty",
+        "day 47 of watching", "this is my life now", "no regrets",
+        "has anything changed", "no", "ok good", "breathing normally",
+        "very calming", "therapeutic honestly", "better than twitch",
+        "the chair is immaculate", "best ergonomics", "would sit in it",
+        "do you think anyone's ever going to sit down", "probably not",
+        "that's the whole point", "ah", "understood", "respect the bit",
+        "following for the plot", "the plot is thin", "the plot is a chair",
+        "pov you wasted your evening", "worth it", "absolutely worth it",
+        "is this what winning looks like", "this is peak entertainment",
+        "my parents asked what i'm watching", "i didn't know how to explain",
+        "told them it was productivity content", "they believed me",
+        "just five more minutes", "that was two hours ago",
+        "this chair has better presence than half my classmates",
+        "honestly impressive", "truly a specimen", "exquisite even",
+        "form follows function", "function is sitting", "form is chair",
+        "the way it just. exists. unreal",
+        "i've made peace with this", "we all have", "acceptance",
+        "the void stares back but it's a chair", "feels safer somehow",
+        "real ones stay", "this guy stayed", "respectable",
+        "chat what are we doing", "being here", "vibing with the furniture",
+        "i've been here since the beginning", "so have i", "there are dozens of us",
+        "honestly the camera work is solid", "completely static btw",
+        "that's what makes it so good", "restraint", "artistic vision",
+        "this is cinema", "spielberg is typing", "scorsese in shambles",
+        "oscar worthy", "robbed at sundance", "film festival judges hate this one trick",
+        "her name is bethany", "the chair", "right bethany",
+        "starting a fan club", "count me in", "bethany deserves recognition",
+        "bethany for president", "bethany for the vga",
+        "imagine the lore", "the chair's backstory", "i don't want to know",
+        "the mystery is what draws me in", "exactly this",
+        "breaking: local furniture exists. more at 11", "breaking news: it's still there",
+        "we interrupt your regularly scheduled programming with: a chair",
+        "i should probably sleep", "same", "who needs sleep anyway",
+        "my sleep schedule is gone", "the chair took it", "fair trade",
+        "very soothing", "meditative state achieved", "one with the chair",
+        "is this mindfulness", "this is mindfulness",
+        "my therapist asked what i do to relax", "i told her i watch a chair",
+        "she hasn't called back", "her loss", "she's missing out",
+        "the stock of empty chairs is up 400%", "bullish on furniture",
+        "invested heavily", "all in on chairs", "portfolio is strong",
+        "honestly comforting", "safe space", "no jumpscares", "just vibes",
+        "would recommend to a friend", "actually no don't tell anyone",
+        "keep this to yourself", "our secret", "the chair's secret",
+        "shh", "okay", "lips sealed", "chair stays between us",
+        "how long has this been live", "forever", "always has been",
+        "time is meaningless here", "the chair exists outside time",
+        "actually deep when you think about it", "i'm thinking about it",
+        "existential crisis? no. existential comfort.", "the chair comforts me",
+        "does it comfort you", "yeah actually", "we're getting through this together",
+        "humans weren't meant to be alone", "good thing there's a chair",
+        "very philosophical", "very empty", "very real",
+        "new category just dropped", "worst case of parasocial relationship",
+        "between me and the furniture", "understandable", "valid",
+        "no one talk to me i'm in the zone", "the zone is watching a chair",
+        "the zone is real", "transcendence through boredom", "chaos magic",
+        "just vibing just chilling", "just sitting and watching chairs sit",
+        "i feel less alone now", "are you good", "i'm great actually",
+        "this really hit different today", "same energy", "this is the way",
+        "eternal recurrence but it's a chair", "nietzsche would understand",
+        "the eternal return of the empty chair", "sounds right",
+        "plato's chair", "plato's chair but better", "plato's chair but honest",
+        "kant would approve of this form", "hegel's chair", "hegelian synthesis",
+        "dialectical materialism but it's furniture", "i'm not saying anything",
+        "neither am i", "yet here we are", "yet the chair remains",
+        "immutable", "unchanging", "eternal", "the chair gods smile upon us",
+        "we are blessed", "blessed by wood and metal", "blessed by the void",
+        "the void shaped like a chair", "perfectly void shaped", "10/10 void",
+        "would sit in the void again", "would recommend the void",
+        "the void has good reviews", "glowing testimonials", "five stars",
+        "no i wasn't expecting this either", "none of us were", "yet here",
+        "fate brought us here", "destiny shaped like a chair", "manifest",
+        "the universe ordered this", "divine intervention but it's furniture",
+        "god said 'let there be a chair' and he was right",
+        "in the beginning there was a chair", "and it was good",
+        "genesis but it's just this", "and god saw that it was good",
+        "a chair", "good", "god", "the holy trinity", "the divine furniture",
+        "religious experience pending", "actually this might be it",
+        "oh god i think i see it", "the face of god", "it's a chair",
+        "makes sense", "everything makes sense now", "nothing will ever be unclear",
+        "truth", "the capital T truth", "chairs", "chairs are truth",
+        "okay i need to go touch grass", "no you don't", "you need this",
+        "the chair needs you", "the chair is calling", "answer it",
+        "can't leave now", "never leave", "never ever", "forever watching",
+        "til death", "till the stream ends", "it won't end", "the stream is eternal",
+        "we are eternal", "the chair is eternal", "we are all eternal furniture",
+        "beautiful", "poetic", "moving", "i've moved on emotionally",
+        "let it go", "never", "let the chair go", "impossible", "unthinkable",
+        "the chair is my rock", "my foundation", "my reason", "my purpose",
+        "what would i do without this chair", "don't think about it",
+        "i'm thinking about it", "don't", "too late", "the damage is done",
+        "we're all damaged here", "damaged by chairs", "reformed by chairs",
+        "reborn in the chair", "baptized in empty wooden furniture",
+        "so it is written", "so shall it be", "amen", "chair-men",
+        "wait that was actually good", "yeah it was", "copyright it",
+        "too late it's in chat", "it belongs to all of us now", "communism",
+        "seize the means of furniture production", "the chair belongs to the people",
+        "eat the rich, sit in the chair", "priorities", "correct priorities",
+        "why are you the way you are", "because of the chair", "yeah that tracks",
+        "alright i'm convinced", "convinced of what", "chairs", "all the way down",
+        "turtles all the way down", "chairs all the way down",
+        "a chair standing on a chair standing on a chair", "infinite chairs",
+        "we live in a society", "a society of chairs", "chairing together",
+        "united we sit", "no wait we're not sitting", "united we don't sit",
+        "divided we stand before this chair", "this changes things",
+        "this changes nothing", "nothing changes when there's a chair",
+        "the only constant is the chair", "and taxes", "and the chair",
+        "three certainties", "death", "taxes", "the chair", "oh god the chair",
     ];
 
     // Lines that trigger a deadpan moderator timeout for impatience.
@@ -722,12 +801,6 @@
         { t: "ACHIEVEMENT", m: "The chair noticed nothing." },
         { t: "MILESTONE",   m: "You and the chair have an understanding now." },
         { t: "ACHIEVEMENT", m: "Out-waited a piece of furniture." },
-    ];
-
-    const NEXT_UP = [
-        { title: "You WON'T believe what this chair does next (NOTHING)", meta: "Infinite Live · 4.1K watching" },
-        { title: "Same chair. Different angle. (It's the same angle.)",   meta: "Infinite Live · 3.8K watching" },
-        { title: "We left a chair on for 847 days — gone wrong?",          meta: "Infinite Live · 4.0K watching" },
     ];
 
     const EMOTES = ["🪑", "👀", "❤️", "🫠"];
@@ -1146,25 +1219,6 @@
     };
 
     /* ========================================================================
-       NEXT-UP RAIL  —  three thumbnails, all the same chair, all "live."
-       ======================================================================== */
-    function buildNextUp() {
-        const grid = $("nextGrid");
-        NEXT_UP.forEach((item) => {
-            const card = document.createElement("div");
-            card.className = "next-card";
-            card.innerHTML =
-                `<div class="next-thumb">
-                    <span class="live-tag">LIVE</span>
-                    <img src="${CONFIG.STREAM_IMAGE_URL}" alt="${escapeHtml(item.title)}">
-                 </div>
-                 <div class="next-title">${escapeHtml(item.title)}</div>
-                 <div class="next-meta">${escapeHtml(item.meta)}</div>`;
-            grid.appendChild(card);
-        });
-    }
-
-    /* ========================================================================
        COLD OPEN  —  "Connecting to stream…" then the big anticlimactic reveal.
        ======================================================================== */
     function coldOpen(done) {
@@ -1207,7 +1261,6 @@
         Controls.init();
         IdleWatcher.init();
         Konami.init();
-        buildNextUp();
     }
 
     // Start with the cold open; everything else begins once it clears.
