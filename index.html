@@ -4,298 +4,1214 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infinite Live Stream</title>
+
+    <!--
+      ============================================================================
+       INFINITE LIVE STREAM  —  doofus.live
+       A zero-maintenance Easter egg. It looks like a serious 24/7 broadcast.
+       It is a single static image of an empty chair. Nothing ever happens.
+       Everything below is theater. The punchline is the silence.
+
+       To reskin the whole joke, edit the CONFIG block in the <script> tag.
+      ============================================================================
+    -->
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ====================================================================
+           THEME — muted, monochrome, deadpan. Restraint is the joke.
+           ==================================================================== */
+        :root {
+            --bg:        #0b0d10;
+            --panel:     #121519;
+            --panel-2:   #0e1114;
+            --line:      #232830;
+            --text:      #c7ccd1;
+            --text-dim:  #6b7280;
+            --text-dimmer:#474d56;
+            --live:      #d83a3a;
+            --accent:    #3a3f47;
+            --mono: "SFMono-Regular", "Courier New", ui-monospace, Menlo, Consolas, monospace;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Courier New', monospace;
-            color: #e0e0e0;
+            padding: 24px;
+            font-family: var(--mono);
+            color: var(--text);
+            letter-spacing: 0.3px;
         }
 
-        .player-container {
-            width: 90%;
-            max-width: 900px;
-            background: #111;
-            border: 3px solid #333;
-            border-radius: 12px;
-            box-shadow:
-                0 0 40px rgba(0, 0, 0, 0.8),
-                inset 0 0 20px rgba(0, 0, 0, 0.5);
+        /* ---- App layout: player + chat side by side, stacks on mobile ---- */
+        .app {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            max-width: 1180px;
+            align-items: stretch;
+        }
+        .stage { flex: 1 1 auto; min-width: 0; }
+
+        /* ====================================================================
+           PLAYER SHELL
+           ==================================================================== */
+        .player {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.55);
         }
 
         .player-header {
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .live-dot {
-            width: 12px;
-            height: 12px;
-            background: #ff4444;
-            border-radius: 50%;
-            animation: pulse 1s ease-in-out infinite;
-            box-shadow: 0 0 8px #ff4444;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                box-shadow: 0 0 8px #ff4444, 0 0 12px #ff2222;
-            }
-            50% {
-                opacity: 0.6;
-                box-shadow: 0 0 4px #ff4444;
-            }
-        }
-
-        .live-text {
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #ff4444;
-            text-shadow: 0 0 4px rgba(255, 68, 68, 0.5);
-        }
-
-        .viewer-count {
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--panel-2);
+            border-bottom: 1px solid var(--line);
             font-size: 12px;
-            color: #888;
-            letter-spacing: 1px;
         }
+        .header-left { display: flex; align-items: center; gap: 10px; }
 
-        .player-video {
-            width: 100%;
+        .live-indicator { display: flex; align-items: center; gap: 7px; }
+        .live-dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: var(--live);
+            box-shadow: 0 0 6px var(--live);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.35; }
+        }
+        .live-text {
+            font-weight: 700; font-size: 12px; letter-spacing: 2px;
+            color: var(--live);
+        }
+        .header-sep { color: var(--text-dimmer); }
+        .watching-from { color: var(--text-dim); }
+        .viewer-count { color: var(--text); font-variant-numeric: tabular-nums; }
+        .viewer-count .label { color: var(--text-dim); }
+
+        /* ====================================================================
+           VIDEO AREA  +  OVERLAYS
+           ==================================================================== */
+        .video {
+            position: relative;
             aspect-ratio: 16 / 9;
             background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
             overflow: hidden;
         }
-
         .video-image {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
             display: block;
+            transition: transform 0.18s ease, filter 1s linear;
         }
 
-        .player-controls {
-            background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-top: 1px solid #2a2a2a;
+        /* ---- CRT overlay: scanlines, vignette, faint flicker ---- */
+        .crt {
+            position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(120% 120% at 50% 50%, transparent 60%, rgba(0,0,0,0.45) 100%),
+                repeating-linear-gradient(
+                    to bottom,
+                    rgba(255,255,255,0.03) 0px,
+                    rgba(255,255,255,0.03) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+            mix-blend-mode: screen;
+            animation: flicker 5s steps(60) infinite;
+        }
+        @keyframes flicker {
+            0%, 97%, 100% { opacity: 0.5; }
+            98%           { opacity: 0.38; }
+            99%           { opacity: 0.6; }
         }
 
-        .control-button {
-            width: 36px;
-            height: 36px;
-            background: #222;
-            border: 1px solid #333;
-            border-radius: 4px;
-            color: #666;
-            cursor: default;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+        /* ---- Burned-in security-cam timestamp (top-left) ---- */
+        .timestamp {
+            position: absolute; top: 10px; left: 12px;
+            font-size: 12px; color: rgba(235,235,235,0.85);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+            font-variant-numeric: tabular-nums;
+            pointer-events: none;
+        }
+        .timestamp .rec-dot { color: var(--live); }
+
+        /* ---- Quality / format badges (top-right) ---- */
+        .badges {
+            position: absolute; top: 10px; right: 12px;
+            display: flex; gap: 6px; pointer-events: none;
+        }
+        .badge {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+            padding: 2px 6px; border-radius: 3px;
+            background: rgba(0,0,0,0.55); color: #d7dbe0;
+            border: 1px solid rgba(255,255,255,0.12);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
         }
 
-        .control-button:hover {
-            opacity: 0.5;
+        /* ---- Signal-strength bars (under badges) ---- */
+        .signal {
+            position: absolute; top: 34px; right: 12px;
+            display: flex; align-items: flex-end; gap: 2px; height: 14px;
+            pointer-events: none;
+        }
+        .signal span {
+            width: 3px; background: rgba(235,235,235,0.85);
+            border-radius: 1px; transition: opacity 0.4s, height 0.4s;
+        }
+        .signal span:nth-child(1){ height: 4px; }
+        .signal span:nth-child(2){ height: 7px; }
+        .signal span:nth-child(3){ height: 10px; }
+        .signal span:nth-child(4){ height: 14px; }
+
+        /* ---- Lower-third chyron ---- */
+        .chyron {
+            position: absolute; left: 0; right: 0; bottom: 0;
+            padding: 10px 14px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            font-size: 12px; color: rgba(235,235,235,0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+        .chyron .accent { color: var(--live); font-weight: 700; }
+
+        /* ---- Buffering overlay (occasionally "loads" the same frame) ---- */
+        .buffering {
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; gap: 12px;
+            background: rgba(0,0,0,0.55); color: #cfd3d8; font-size: 12px;
+            pointer-events: none;
+        }
+        .buffering.active { display: flex; }
+        .spinner {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.18);
+            border-top-color: rgba(255,255,255,0.8);
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ---- "Signal lost" static burst ---- */
+        .static {
+            position: absolute; inset: 0; display: none;
+            background-color: #111;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 4px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 4px);
+            pointer-events: none;
+        }
+        .static.active { display: block; animation: staticShift 0.08s steps(2) infinite; }
+        @keyframes staticShift {
+            0%   { background-position: 0 0, 0 0; }
+            100% { background-position: 3px 2px, -2px 3px; }
+        }
+        .static-label {
+            position: absolute; inset: 0; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 12px; letter-spacing: 2px; color: #9aa0a6;
         }
 
-        .progress-bar {
-            flex: 1;
-            height: 3px;
-            background: #333;
-            border-radius: 2px;
-            position: relative;
+        /* ---- Breaking-news banner ---- */
+        .breaking {
+            position: absolute; left: 0; right: 0; bottom: 44px;
+            display: none; align-items: center;
+            background: rgba(0,0,0,0.78);
+            border-top: 1px solid rgba(216,58,58,0.6);
+            font-size: 12px; overflow: hidden; white-space: nowrap;
+        }
+        .breaking.active { display: flex; }
+        .breaking .tag {
+            background: var(--live); color: #fff; font-weight: 700;
+            padding: 4px 8px; letter-spacing: 1px; flex: none;
+        }
+        .breaking .crawl {
+            padding: 4px 0; color: #e6e8eb;
+            animation: crawl 18s linear infinite;
+        }
+        @keyframes crawl {
+            from { transform: translateX(100%); }
+            to   { transform: translateX(-100%); }
+        }
+
+        /* ---- "Are you still watching?" idle overlay ---- */
+        .idle-veil {
+            position: absolute; inset: 0; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            gap: 16px; text-align: center;
+            background: rgba(6,8,10,0.92);
+            padding: 24px;
+        }
+        .idle-veil.active { display: flex; }
+        .idle-veil h2 { font-size: 18px; font-weight: 600; color: var(--text); }
+        .idle-veil p  { font-size: 12px; color: var(--text-dim); max-width: 320px; }
+        .idle-btn {
+            font-family: var(--mono); font-size: 13px;
+            padding: 9px 18px; border-radius: 5px; cursor: pointer;
+            background: #1c2026; color: var(--text);
+            border: 1px solid var(--line);
+        }
+        .idle-btn:hover { background: #232830; }
+
+        /* ---- Raid banner (rare, flat) ---- */
+        .raid {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: none; padding: 10px 16px; border-radius: 6px;
+            background: rgba(6,8,10,0.85); border: 1px solid var(--line);
+            font-size: 13px; color: var(--text); text-align: center;
+        }
+        .raid.active { display: block; }
+
+        /* ---- Floating emote layer (used very sparingly) ---- */
+        .emote-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .emote {
+            position: absolute; bottom: 56px; font-size: 20px; opacity: 0;
+            animation: floatUp 4s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+            15%  { opacity: 0.9; }
+            100% { opacity: 0; transform: translateY(-120px) scale(1.1); }
+        }
+
+        /* ====================================================================
+           CONTROLS  (mostly inert; volume + fullscreen actually work)
+           ==================================================================== */
+        .controls {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px;
+            background: var(--panel-2);
+            border-top: 1px solid var(--line);
+        }
+        .ctrl {
+            width: 32px; height: 32px; flex: none;
+            display: flex; align-items: center; justify-content: center;
+            background: transparent; color: var(--text-dim);
+            border: 1px solid transparent; border-radius: 5px;
+            font-size: 14px; cursor: default;
+            font-family: var(--mono);
+        }
+        .ctrl.live-clickable { cursor: pointer; color: var(--text); }
+        .ctrl.live-clickable:hover { background: #1c2026; }
+        .progress {
+            flex: 1 1 auto; height: 4px; border-radius: 2px;
+            background: #20252c; position: relative; cursor: default;
+        }
+        .progress::after {
+            content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 100%; border-radius: 2px;
+            background: rgba(216,58,58,0.5);
+        }
+        .live-pill {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            color: var(--live); border: 1px solid rgba(216,58,58,0.5);
+            border-radius: 3px; padding: 2px 6px; flex: none;
+        }
+        .quality-select {
+            font-family: var(--mono); font-size: 11px;
+            background: #1c2026; color: var(--text);
+            border: 1px solid var(--line); border-radius: 5px;
+            padding: 5px 6px; cursor: pointer;
+        }
+
+        /* ====================================================================
+           FOOTER STAT STRIP
+           ==================================================================== */
+        .stats {
+            display: flex; flex-wrap: wrap; gap: 4px 18px;
+            padding: 9px 14px;
+            background: var(--panel);
+            border-top: 1px solid var(--line);
+            font-size: 11px; color: var(--text-dim);
+        }
+        .stats b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        /* ====================================================================
+           CHAT COLUMN
+           ==================================================================== */
+        .chat {
+            flex: 0 0 300px;
+            display: flex; flex-direction: column;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
             overflow: hidden;
         }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #666, #888);
-            border-radius: 2px;
+        .chat-header {
+            padding: 10px 14px; font-size: 12px; color: var(--text-dim);
+            border-bottom: 1px solid var(--line);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .chat-header .title { color: var(--text); letter-spacing: 1px; }
+        .chat-body {
+            flex: 1 1 auto; overflow-y: auto; padding: 10px 12px;
+            display: flex; flex-direction: column; gap: 7px;
+            min-height: 280px;
+        }
+        .chat-body::-webkit-scrollbar { width: 8px; }
+        .chat-body::-webkit-scrollbar-thumb { background: #232830; border-radius: 4px; }
+        .msg { font-size: 12px; line-height: 1.45; word-wrap: break-word; }
+        .msg .user { font-weight: 700; }
+        .msg .text { color: var(--text); }
+        .msg.system { color: var(--text-dimmer); font-style: italic; }
+        .msg.super {
+            background: rgba(216,58,58,0.10);
+            border: 1px solid rgba(216,58,58,0.35);
+            border-radius: 5px; padding: 6px 8px;
+        }
+        .msg.super .user { color: var(--live); }
+        .chat-input {
+            display: flex; gap: 8px; padding: 10px 12px;
+            border-top: 1px solid var(--line);
+        }
+        .chat-input input {
+            flex: 1 1 auto; font-family: var(--mono); font-size: 12px;
+            background: #0e1114; color: var(--text-dim);
+            border: 1px solid var(--line); border-radius: 5px;
+            padding: 7px 9px;
+        }
+        .chat-input input::placeholder { color: var(--text-dimmer); }
+        .chat-input button {
+            font-family: var(--mono); font-size: 12px;
+            background: #1c2026; color: var(--text-dim);
+            border: 1px solid var(--line); border-radius: 5px;
+            padding: 7px 12px; cursor: default;
         }
 
-        .time-display {
-            font-size: 11px;
-            color: #666;
-            letter-spacing: 1px;
-            min-width: 50px;
+        /* ====================================================================
+           "NEXT UP" RAIL
+           ==================================================================== */
+        .next-up { margin-top: 16px; }
+        .next-up .heading {
+            font-size: 11px; color: var(--text-dim); letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .next-card {
+            border: 1px solid var(--line); border-radius: 7px; overflow: hidden;
+            background: var(--panel-2); cursor: default;
+        }
+        .next-thumb {
+            position: relative; aspect-ratio: 16/9; overflow: hidden; background: #000;
+        }
+        .next-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+        .next-thumb .live-tag {
+            position: absolute; top: 5px; left: 5px;
+            background: var(--live); color: #fff; font-size: 8px; font-weight: 700;
+            letter-spacing: 1px; padding: 1px 4px; border-radius: 2px;
+        }
+        .next-card .next-title { font-size: 11px; color: var(--text); padding: 7px 8px 3px; line-height: 1.35; }
+        .next-card .next-meta  { font-size: 10px; color: var(--text-dim); padding: 0 8px 8px; }
+
+        /* ====================================================================
+           TOASTS (achievements — dry one-liners)
+           ==================================================================== */
+        .toasts {
+            position: fixed; bottom: 18px; right: 18px;
+            display: flex; flex-direction: column; gap: 8px;
+            z-index: 50;
+        }
+        .toast {
+            background: var(--panel); border: 1px solid var(--line);
+            border-left: 3px solid var(--accent);
+            border-radius: 6px; padding: 10px 14px; max-width: 280px;
+            font-size: 12px; color: var(--text);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: toastIn 0.25s ease, toastOut 0.4s ease 4.4s forwards;
+        }
+        .toast .toast-title { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 2px; }
+        @keyframes toastIn  { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(20px); } }
+
+        /* ====================================================================
+           COLD-OPEN ("Connecting to stream…")
+           ==================================================================== */
+        .cold-open {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 18px;
+            background: var(--bg);
+            transition: opacity 0.6s ease;
+        }
+        .cold-open.done { opacity: 0; pointer-events: none; }
+        .cold-spinner {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-top-color: rgba(255,255,255,0.7);
+            animation: spin 0.9s linear infinite;
+        }
+        .cold-text { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+
+        /* ====================================================================
+           RESPONSIVE — chat drops below the player on narrow screens
+           ==================================================================== */
+        @media (max-width: 860px) {
+            .app { flex-direction: column; }
+            .chat { flex-basis: auto; }
+            .chat-body { min-height: 200px; max-height: 260px; }
+            .next-grid { grid-template-columns: 1fr; }
         }
 
-        .player-footer {
-            background: #0a0a0a;
-            padding: 8px 16px;
-            border-top: 1px solid #222;
-            text-align: right;
-            font-size: 11px;
-            color: #555;
-        }
-
-        @media (max-width: 600px) {
-            .player-container {
-                border-radius: 8px;
-                border-width: 2px;
-            }
-
-            .player-header {
-                padding: 10px 12px;
-            }
-
-            .live-text {
-                font-size: 12px;
-                letter-spacing: 1px;
-            }
-
-            .viewer-count {
-                font-size: 10px;
-            }
-
-            .control-button {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
+        /* ---- Respect reduced-motion: calm the flicker/scanlines/spin ---- */
+        @media (prefers-reduced-motion: reduce) {
+            .crt { animation: none; }
+            .live-dot { animation: none; opacity: 0.85; }
+            .static.active { animation: none; }
+            .breaking .crawl { animation: none; }
+            .emote { animation-duration: 2.5s; }
         }
     </style>
 </head>
 <body>
-    <div class="player-container">
-        <!-- Header with LIVE indicator and viewer count -->
-        <div class="player-header">
-            <div class="live-indicator">
-                <div class="live-dot"></div>
-                <div class="live-text">LIVE</div>
+
+    <!-- ========================= COLD OPEN ========================= -->
+    <div class="cold-open" id="coldOpen">
+        <div class="cold-spinner"></div>
+        <div class="cold-text" id="coldText">Connecting to stream…</div>
+    </div>
+
+    <!-- ============================ APP ============================ -->
+    <div class="app">
+        <!-- ----------------------- STAGE ------------------------- -->
+        <div class="stage">
+            <div class="player">
+
+                <!-- Header: LIVE + where-from + viewer count -->
+                <div class="player-header">
+                    <div class="header-left">
+                        <div class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span class="live-text">LIVE</span>
+                        </div>
+                        <span class="header-sep">·</span>
+                        <span class="watching-from" id="watchingFrom">watching from —</span>
+                    </div>
+                    <div class="viewer-count" id="viewerCount">
+                        <span class="value">—</span> <span class="label">watching</span>
+                    </div>
+                </div>
+
+                <!-- Video + all the overlays -->
+                <div class="video">
+                    <!--
+                      ============================================================
+                       >>> THE STREAM IMAGE <<<
+                       Swap STREAM_IMAGE_URL in the CONFIG block below to change
+                       the subject. This <img> only sets a fallback.
+                      ============================================================
+                    -->
+                    <img id="streamImage" class="video-image"
+                         src="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop"
+                         alt="A live broadcast of an empty chair.">
+
+                    <div class="crt"></div>
+
+                    <div class="timestamp">
+                        <span class="rec-dot">●</span> REC&nbsp;<span id="timestamp">--:--:--</span>
+                    </div>
+
+                    <div class="badges">
+                        <span class="badge" id="badgeRes">4K ULTRA</span>
+                        <span class="badge">HDR</span>
+                        <span class="badge">60FPS</span>
+                    </div>
+
+                    <div class="signal" id="signalBars">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+
+                    <div class="chyron">
+                        <span class="accent">LIVE</span> · <span id="chyronText">An unremarkable room</span>
+                    </div>
+
+                    <!-- Hidden-until-triggered overlays -->
+                    <div class="buffering" id="buffering">
+                        <div class="spinner"></div>
+                        <div>Buffering…</div>
+                    </div>
+
+                    <div class="static" id="staticBurst">
+                        <div class="static-label">SIGNAL LOST — RECONNECTING</div>
+                    </div>
+
+                    <div class="breaking" id="breaking">
+                        <span class="tag">BREAKING</span>
+                        <span class="crawl" id="breakingText"></span>
+                    </div>
+
+                    <div class="raid" id="raid"></div>
+
+                    <div class="idle-veil" id="idleVeil">
+                        <h2>Are you still watching?</h2>
+                        <p>The stream has detected no signs of life. Neither have we.</p>
+                        <button class="idle-btn" id="idleBtn">Continue watching</button>
+                    </div>
+
+                    <div class="emote-layer" id="emoteLayer"></div>
+                </div>
+
+                <!-- Controls: inert except volume + fullscreen -->
+                <div class="controls">
+                    <div class="ctrl" title="It's live. There is no pause.">❚❚</div>
+                    <div class="ctrl live-clickable" id="volumeBtn"
+                         title="Unmute the room tone (it's a refrigerator)">🔇</div>
+                    <div class="progress" title="You cannot rewind real life."></div>
+                    <span class="live-pill">LIVE</span>
+                    <select class="quality-select" id="qualitySelect" title="Resolution">
+                        <option>8K</option>
+                        <option>4K UHD</option>
+                        <option>1080p60</option>
+                        <option>480p</option>
+                        <option selected>Chair (native)</option>
+                    </select>
+                    <div class="ctrl live-clickable" id="shareBtn" title="Share this moment">⤴</div>
+                    <div class="ctrl live-clickable" id="fullscreenBtn" title="Fullscreen">⛶</div>
+                </div>
+
+                <!-- Footer stat strip -->
+                <div class="stats">
+                    <span>peak today <b id="statPeak">—</b></span>
+                    <span>uptime <b id="statUptime">—</b></span>
+                    <span>bitrate <b id="statBitrate">0.0 kbps</b></span>
+                    <span>dropped frames <b id="statDropped">0</b></span>
+                    <span>watch time <b id="statWatch">00:00:00</b></span>
+                    <span><b id="statTalking">0</b> people are talking about this</span>
+                </div>
             </div>
-            <div class="viewer-count" id="viewerCount">Loading...</div>
-        </div>
 
-        <!-- Video display area -->
-        <div class="player-video">
-            <img
-                id="streamImage"
-                class="video-image"
-                src="https://picsum.photos/800/450?random=1"
-                alt="Live Stream"
-            >
-        </div>
-
-        <!-- Player controls (non-functional) -->
-        <div class="player-controls">
-            <div class="control-button">▶</div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
+            <!-- NEXT UP rail -->
+            <div class="next-up">
+                <div class="heading">NEXT UP — RECOMMENDED FOR YOU</div>
+                <div class="next-grid" id="nextGrid"></div>
             </div>
-            <div class="time-display">LIVE</div>
         </div>
 
-        <!-- Footer -->
-        <div class="player-footer">
-            Infinite Live Stream™ — Zero Maintenance Broadcasting
+        <!-- ----------------------- CHAT -------------------------- -->
+        <div class="chat">
+            <div class="chat-header">
+                <span class="title">STREAM CHAT</span>
+                <span id="chatCount">—</span>
+            </div>
+            <div class="chat-body" id="chatBody"></div>
+            <div class="chat-input">
+                <input type="text" placeholder="Chat is in subscriber-only mode" disabled>
+                <button disabled>Chat</button>
+            </div>
         </div>
     </div>
 
+    <!-- Toast container -->
+    <div class="toasts" id="toasts"></div>
+
     <script>
-        /**
-         * CONFIGURATION
-         * Modify these settings to customize the stream appearance and behavior
-         */
+    /* ========================================================================
+       CONFIG  —  edit everything here to reskin the joke.
+       The whole site reads from these constants and arrays.
+       ======================================================================== */
+    const CONFIG = {
+        // >>> The one line most people will want to change: <<<
+        STREAM_IMAGE_URL: "https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop",
 
-        // URL of the image to display (easily swappable)
-        // Current: Random mundane image from picsum.photos
-        // Examples of alternatives:
-        // - https://via.placeholder.com/800x450/333333/555555
-        // - https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?w=800&h=450
-        const STREAM_IMAGE_URL = 'https://picsum.photos/800/450?random=1';
+        // What is being broadcast (used in copy throughout). Keep it mundane.
+        SUBJECT: "an empty chair",
 
-        // Initial viewer count
-        const INITIAL_VIEWERS = Math.floor(Math.random() * 8000) + 1000;
+        // Viewer counter behavior
+        viewers: {
+            initial:   () => Math.floor(Math.random() * 1200) + 3200, // ~3.2k–4.4k
+            min:       180,
+            max:       9000,
+            drift:     { min: -90, max: 120 },   // per tick
+            tickMs:    2500,
+        },
 
-        // Range for random fluctuations (viewers per update)
-        const FLUCTUATION_RANGE = { min: -150, max: 350 };
+        // How often the fake clock pretends the stream has been running.
+        // Big number = "this has been live for years." Pure deadpan.
+        uptimeStartDaysAgo: 847,
 
-        // Interval for viewer count updates (milliseconds)
-        const UPDATE_INTERVAL = 2000;
+        // Cadence (ms) ranges for the various gags. Deadpan = slow.
+        timing: {
+            chatEveryMs:      [4000, 9000],
+            bufferEveryMs:    [45000, 90000],
+            signalLostEveryMs:[70000, 140000],
+            breakingEveryMs:  [60000, 120000],
+            raidEveryMs:      [120000, 240000],
+            achievementEveryMs:[35000, 75000],
+            emoteEveryMs:     [20000, 45000],
+            idleAfterMs:      300000,  // 5 minutes
+        },
+    };
 
-        /**
-         * Viewer Counter System
-         * Simulates realistic viewer fluctuations
-         */
-        class ViewerCounter {
-            constructor(initialCount) {
-                this.currentCount = initialCount;
-                this.minCount = 100;
-                this.maxCount = 50000;
-                this.element = document.getElementById('viewerCount');
+    /* ---- Editable copy pools (deadpan, chair-themed) -------------------- */
+    const CHAT_USERS = [
+        "quiet_observer", "still_here_2026", "furniture_fan", "ambient_andy",
+        "seated_skeptic", "RegionalManager", "nothing_happens_fan", "chair_truther",
+        "lurker_no_47", "mods", "patient_pete", "doomscroll_dan", "first_time_caller",
+        "load_bearing_larry", "the_intern",
+    ];
+
+    const CHAT_LINES = [
+        "is it still a chair?", "yep", "still empty", "nobody has sat down yet",
+        "i've been watching for three hours", "compelling", "it already started",
+        "this is the most honest stream on the internet", "10/10 would sit",
+        "the chair remains", "remarkable stability", "no notes",
+        "peak content", "i feel seen. the chair does not.", "great stream",
+        "anyone else here", "yeah", "what are we doing here", "living the dream",
+        "the lighting is doing a lot of work", "subscribed", "this is fine",
+        "i could watch this for hours. i have.", "any minute now",
+    ];
+
+    // Lines that trigger a deadpan moderator timeout for impatience.
+    const IMPATIENT_LINES = [
+        "when does something happen", "ok but when does it START",
+        "is anything going to happen or", "how long until something happens",
+    ];
+
+    const SUPERCHATS = [
+        { amt: "$5",  text: "no message" },
+        { amt: "$2",  text: "keep up the good work" },
+        { amt: "$10", text: "I appreciate the consistency" },
+        { amt: "$1",  text: "is anyone going to sit down" },
+        { amt: "$3",  text: "thank you for your service" },
+        { amt: "$20", text: "my accountant says this is a business expense" },
+        { amt: "$7",  text: "for the chair" },
+    ];
+
+    const CHYRON_PLACES = [
+        "An unremarkable room", "A spare bedroom · Scranton",
+        "A waiting area · Slough", "Somewhere in Ohio", "A kitchen · Wuppertal",
+        "A back office · Bakersfield", "A hallway · Hull", "A study · Toledo",
+        "An undisclosed living room", "A breakroom · Indianapolis",
+    ];
+
+    const WATCH_REGIONS = [
+        "🇬🇧 Slough", "🇺🇸 Ohio", "🇨🇦 Saskatchewan", "🇩🇪 Wuppertal",
+        "🇧🇪 Belgium", "🇳🇿 a sheep farm", "🇦🇺 Wagga Wagga", "🇮🇪 Cork",
+        "🇳🇱 a houseboat", "🇫🇮 somewhere quiet",
+    ];
+
+    const RAID_PARTIES = [
+        "RegionalFurnitureCo", "the_other_chair_stream", "AmbientNoiseFans",
+        "PeopleWhoOwnDesks", "the_waiting_room", "MildlyInteresting",
+    ];
+
+    const BREAKING_LINES = [
+        "Nothing is happening. We will keep you updated as the situation does not develop.",
+        "The chair remains unoccupied. Officials have not been called.",
+        "No change. Experts say this is consistent with previous footage.",
+        "Sources confirm the chair has not moved. More as it fails to develop.",
+        "Update: still a chair. Authorities are not involved and will not be.",
+    ];
+
+    const ACHIEVEMENTS = [
+        { t: "ACHIEVEMENT", m: "Watched an empty chair for 60 seconds." },
+        { t: "ACHIEVEMENT", m: "Witnessed nothing, beautifully." },
+        { t: "ACHIEVEMENT", m: "Still here." },
+        { t: "ACHIEVEMENT", m: "Two minutes of your finite life. Gone." },
+        { t: "ACHIEVEMENT", m: "The chair noticed nothing." },
+        { t: "MILESTONE",   m: "You and the chair have an understanding now." },
+        { t: "ACHIEVEMENT", m: "Out-waited a piece of furniture." },
+    ];
+
+    const NEXT_UP = [
+        { title: "You WON'T believe what this chair does next (NOTHING)", meta: "Infinite Live · 4.1K watching" },
+        { title: "Same chair. Different angle. (It's the same angle.)",   meta: "Infinite Live · 3.8K watching" },
+        { title: "We left a chair on for 847 days — gone wrong?",          meta: "Infinite Live · 4.0K watching" },
+    ];
+
+    const EMOTES = ["🪑", "👀", "❤️", "🫠"];
+
+    /* ========================================================================
+       UTILITIES
+       ======================================================================== */
+    const $ = (id) => document.getElementById(id);
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const randInt = (min, max) => Math.floor(rand(min, max + 1));
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const pad = (n) => String(n).padStart(2, "0");
+    const prefersReducedMotion =
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Schedule a repeating action with a *random* gap each time (deadpan rhythm).
+    function loop(rangeMs, fn) {
+        const next = () => {
+            fn();
+            setTimeout(next, randInt(rangeMs[0], rangeMs[1]));
+        };
+        setTimeout(next, randInt(rangeMs[0], rangeMs[1]));
+    }
+
+    /* ========================================================================
+       VIEWER COUNTER  —  drifts gently, occasionally raided, tracks a peak.
+       ======================================================================== */
+    const ViewerCounter = {
+        count: 0,
+        peak: 0,
+        el: $("viewerCount").querySelector(".value"),
+        peakEl: $("statPeak"),
+        chatCountEl: $("chatCount"),
+
+        init() {
+            this.count = CONFIG.viewers.initial();
+            this.peak = this.count;
+            this.render();
+            loop([CONFIG.viewers.tickMs, CONFIG.viewers.tickMs], () => this.drift());
+        },
+        drift() {
+            const d = CONFIG.viewers.drift;
+            this.set(this.count + randInt(d.min, d.max));
+        },
+        set(n) {
+            this.count = Math.max(CONFIG.viewers.min, Math.min(CONFIG.viewers.max, Math.round(n)));
+            this.peak = Math.max(this.peak, this.count);
+            this.render();
+        },
+        // A raid: a flat bump that decays back down over the next minute.
+        raid(amount) {
+            this.set(this.count + amount);
+            let steps = 6;
+            const decay = setInterval(() => {
+                this.set(this.count - amount / 6);
+                if (--steps <= 0) clearInterval(decay);
+            }, 10000);
+        },
+        render() {
+            this.el.textContent = this.count.toLocaleString();
+            this.peakEl.textContent = this.peak.toLocaleString();
+            this.chatCountEl.textContent = Math.round(this.count * 0.31).toLocaleString();
+        },
+    };
+
+    /* ========================================================================
+       STREAM CLOCK  —  burned-in REC timestamp + absurd uptime.
+       ======================================================================== */
+    const StreamClock = {
+        tsEl: $("timestamp"),
+        upEl: $("statUptime"),
+        startedAt: Date.now() - CONFIG.uptimeStartDaysAgo * 86400000,
+
+        init() {
+            this.tick();
+            setInterval(() => this.tick(), 1000);
+        },
+        tick() {
+            const now = new Date();
+            this.tsEl.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+            let s = Math.floor((Date.now() - this.startedAt) / 1000);
+            const days = Math.floor(s / 86400); s -= days * 86400;
+            const h = Math.floor(s / 3600);     s -= h * 3600;
+            const m = Math.floor(s / 60);        s -= m * 60;
+            this.upEl.textContent = `${days}d ${pad(h)}:${pad(m)}:${pad(s)}`;
+        },
+    };
+
+    /* ========================================================================
+       WATCH TIME  —  how long YOU, specifically, have watched a chair.
+       ======================================================================== */
+    const WatchTime = {
+        el: $("statWatch"),
+        start: Date.now(),
+        init() { setInterval(() => this.tick(), 1000); },
+        tick() {
+            let s = Math.floor((Date.now() - this.start) / 1000);
+            const h = Math.floor(s / 3600); s -= h * 3600;
+            const m = Math.floor(s / 60);    s -= m * 60;
+            this.el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+        },
+    };
+
+    /* ========================================================================
+       SIGNAL / BITRATE / DROPPED FRAMES  —  pure cosmetic theater.
+       ======================================================================== */
+    const Telemetry = {
+        bars: $("signalBars").children,
+        bitrateEl: $("statBitrate"),
+        droppedEl: $("statDropped"),
+        dropped: 0,
+
+        init() {
+            this.tick();
+            setInterval(() => this.tick(), 1800);
+        },
+        tick() {
+            // Twitch the signal bars.
+            for (const bar of this.bars) {
+                bar.style.opacity = Math.random() < 0.22 ? "0.25" : "0.9";
             }
+            // A nonsense-but-stable-ish bitrate for a static JPEG.
+            this.bitrateEl.textContent = (Math.random() * 0.6 + 0.1).toFixed(1) + " kbps";
+            // Frames "drop" now and then.
+            if (Math.random() < 0.5) this.dropped += randInt(1, 4);
+            this.droppedEl.textContent = this.dropped.toLocaleString();
+        },
+    };
 
-            update() {
-                // Generate random fluctuation
-                const change = Math.floor(
-                    Math.random() *
-                    (FLUCTUATION_RANGE.max - FLUCTUATION_RANGE.min + 1) +
-                    FLUCTUATION_RANGE.min
-                );
+    /* ========================================================================
+       CHAT BOT  —  slow, dry, occasionally pays money to say nothing.
+       ======================================================================== */
+    const ChatBot = {
+        body: $("chatBody"),
 
-                this.currentCount = Math.max(
-                    this.minCount,
-                    Math.min(this.maxCount, this.currentCount + change)
-                );
+        init() {
+            // Seed a few lines so the chat isn't empty on arrival.
+            for (let i = 0; i < 5; i++) this.say();
+            loop(CONFIG.timing.chatEveryMs, () => this.beat());
+        },
+        beat() {
+            const roll = Math.random();
+            if (roll < 0.06) return this.superchat();
+            if (roll < 0.12) return this.impatient();
+            this.say();
+        },
+        addRow(node) {
+            this.body.appendChild(node);
+            // Keep the DOM light: cap history.
+            while (this.body.children.length > 40) this.body.removeChild(this.body.firstChild);
+            this.body.scrollTop = this.body.scrollHeight;
+        },
+        say(user = pick(CHAT_USERS), text = pick(CHAT_LINES)) {
+            const row = document.createElement("div");
+            row.className = "msg";
+            row.innerHTML =
+                `<span class="user" style="color:${userColor(user)}">${user}</span>` +
+                `<span style="color:var(--text-dimmer)">: </span>` +
+                `<span class="text">${escapeHtml(text)}</span>`;
+            this.addRow(row);
+        },
+        superchat() {
+            const s = pick(SUPERCHATS);
+            const user = pick(CHAT_USERS);
+            const row = document.createElement("div");
+            row.className = "msg super";
+            row.innerHTML =
+                `<span class="user">${user}</span> donated <b>${s.amt}</b><br>` +
+                `<span class="text">${escapeHtml(s.text)}</span>`;
+            this.addRow(row);
+        },
+        // Someone asks when something happens; a moderator quietly removes them.
+        impatient() {
+            const user = pick(CHAT_USERS);
+            this.say(user, pick(IMPATIENT_LINES));
+            setTimeout(() => {
+                const row = document.createElement("div");
+                row.className = "msg system";
+                row.textContent = `${user} has been timed out (600s) by a moderator.`;
+                this.addRow(row);
+            }, 1400);
+        },
+        system(text) {
+            const row = document.createElement("div");
+            row.className = "msg system";
+            row.textContent = text;
+            this.addRow(row);
+        },
+    };
 
-                this.render();
+    // Stable per-user color so names look consistent (muted palette).
+    function userColor(user) {
+        let h = 0;
+        for (let i = 0; i < user.length; i++) h = (h * 31 + user.charCodeAt(i)) % 360;
+        return `hsl(${h}, 30%, 62%)`;
+    }
+    function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, (c) => (
+            { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+        ));
+    }
+
+    /* ========================================================================
+       CONTROLS THEATER  —  buffering, signal loss, raids, breaking news, emotes
+       ======================================================================== */
+    const Theater = {
+        buffering: $("buffering"),
+        staticBurst: $("staticBurst"),
+        breaking: $("breaking"),
+        breakingText: $("breakingText"),
+        raidEl: $("raid"),
+        chyron: $("chyronText"),
+        watchingFrom: $("watchingFrom"),
+        emoteLayer: $("emoteLayer"),
+
+        init() {
+            // Rotate the chyron + "watching from" every so often.
+            this.rotateLabels();
+            setInterval(() => this.rotateLabels(), 12000);
+
+            loop(CONFIG.timing.bufferEveryMs, () => this.buffer());
+            loop(CONFIG.timing.signalLostEveryMs, () => this.signalLost());
+            loop(CONFIG.timing.breakingEveryMs, () => this.runBreaking());
+            loop(CONFIG.timing.raidEveryMs, () => this.runRaid());
+            loop(CONFIG.timing.emoteEveryMs, () => this.emote());
+        },
+        rotateLabels() {
+            this.chyron.textContent = pick(CHYRON_PLACES);
+            this.watchingFrom.textContent = "watching from " + pick(WATCH_REGIONS);
+        },
+        // "Buffer" for ~2s and reveal the identical frame.
+        buffer() {
+            this.buffering.classList.add("active");
+            setTimeout(() => this.buffering.classList.remove("active"), 2000);
+        },
+        // Brief static, then it "reconnects" to the same chair.
+        signalLost() {
+            this.staticBurst.classList.add("active");
+            setTimeout(() => this.staticBurst.classList.remove("active"), randInt(700, 1500));
+        },
+        runBreaking() {
+            this.breakingText.textContent = pick(BREAKING_LINES);
+            this.breaking.classList.add("active");
+            setTimeout(() => this.breaking.classList.remove("active"), 18000);
+        },
+        runRaid() {
+            const party = pick(RAID_PARTIES);
+            const amount = randInt(600, 2200);
+            this.raidEl.textContent = `${party} raided with ${amount.toLocaleString()} viewers.`;
+            this.raidEl.classList.add("active");
+            ViewerCounter.raid(amount);
+            ChatBot.system(`${party} is raiding with ${amount.toLocaleString()} viewers.`);
+            setTimeout(() => this.raidEl.classList.remove("active"), 6000);
+        },
+        // A single drifting emote — never a storm.
+        emote() {
+            const e = document.createElement("div");
+            e.className = "emote";
+            e.textContent = pick(EMOTES);
+            e.style.left = randInt(10, 85) + "%";
+            this.emoteLayer.appendChild(e);
+            setTimeout(() => e.remove(), 4200);
+        },
+    };
+
+    /* ========================================================================
+       TOASTS  —  dry achievement one-liners.
+       ======================================================================== */
+    const Toasts = {
+        host: $("toasts"),
+        show({ t, m }) {
+            const el = document.createElement("div");
+            el.className = "toast";
+            el.innerHTML = `<div class="toast-title">${t}</div><div>${escapeHtml(m)}</div>`;
+            this.host.appendChild(el);
+            setTimeout(() => el.remove(), 5000);
+        },
+        init() {
+            loop(CONFIG.timing.achievementEveryMs, () => this.show(pick(ACHIEVEMENTS)));
+        },
+    };
+
+    /* ========================================================================
+       TAB STATE  —  live title + generated red-dot favicon.
+       ======================================================================== */
+    const TabState = {
+        init() {
+            this.setFavicon();
+            setInterval(() => {
+                document.title = `● LIVE — ${ViewerCounter.count.toLocaleString()} watching`;
+            }, 2000);
+        },
+        // Draw a tiny red "live" dot favicon on a canvas — no external file.
+        setFavicon() {
+            const c = document.createElement("canvas");
+            c.width = c.height = 32;
+            const x = c.getContext("2d");
+            x.fillStyle = "#0b0d10"; x.fillRect(0, 0, 32, 32);
+            x.beginPath(); x.arc(16, 16, 8, 0, Math.PI * 2);
+            x.fillStyle = "#d83a3a"; x.fill();
+            const link = document.createElement("link");
+            link.rel = "icon"; link.href = c.toDataURL("image/png");
+            document.head.appendChild(link);
+        },
+    };
+
+    /* ========================================================================
+       WORKING CONTROLS  —  volume (room tone), fullscreen, share.
+       Everything else is deliberately inert.
+       ======================================================================== */
+    const Controls = {
+        audioCtx: null,
+        audioOn: false,
+
+        init() {
+            $("volumeBtn").addEventListener("click", () => this.toggleAudio());
+            $("fullscreenBtn").addEventListener("click", () => this.toggleFullscreen());
+            $("shareBtn").addEventListener("click", () => this.share());
+        },
+
+        // Generate a low refrigerator-ish hum with WebAudio — no audio file needed.
+        toggleAudio() {
+            const btn = $("volumeBtn");
+            if (!this.audioOn) {
+                this.audioCtx = this.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                const ctx = this.audioCtx;
+                this.nodes = [];
+                // Two detuned low oscillators + a gentle gain = appliance hum.
+                [56, 84].forEach((freq) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.value = freq;
+                    gain.gain.value = 0.04;
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start();
+                    this.nodes.push(osc, gain);
+                });
+                this.audioOn = true;
+                btn.textContent = "🔊";
+                Toasts.show({ t: "AUDIO", m: "Room tone enabled. That is a refrigerator." });
+            } else {
+                this.nodes.forEach((n) => n.stop && n.stop());
+                if (this.audioCtx) this.audioCtx.close();
+                this.audioCtx = null; this.audioOn = false;
+                btn.textContent = "🔇";
             }
+        },
 
-            render() {
-                // Format viewer count with thousands separator
-                const formatted = this.currentCount.toLocaleString();
-                this.element.textContent = `${formatted} Viewer${this.currentCount !== 1 ? 's' : ''}`;
+        toggleFullscreen() {
+            const el = document.querySelector(".video");
+            if (!document.fullscreenElement) {
+                el.requestFullscreen && el.requestFullscreen();
+            } else {
+                document.exitFullscreen && document.exitFullscreen();
             }
-        }
+        },
 
-        // Initialize and start the viewer counter
-        const viewerCounter = new ViewerCounter(INITIAL_VIEWERS);
-        viewerCounter.render();
+        async share() {
+            const mins = Math.max(1, Math.round((Date.now() - WatchTime.start) / 60000));
+            const text = `I just watched ${CONFIG.SUBJECT} live for ${mins} minute${mins !== 1 ? "s" : ""}. 🪑 doofus.live`;
+            try {
+                await navigator.clipboard.writeText(text);
+                Toasts.show({ t: "COPIED", m: "Your shame is on the clipboard." });
+            } catch {
+                Toasts.show({ t: "SHARE", m: text });
+            }
+        },
+    };
 
-        // Update viewer count at regular intervals
-        setInterval(() => {
-            viewerCounter.update();
-        }, UPDATE_INTERVAL);
+    /* ========================================================================
+       IDLE WATCHER  —  Netflix-style "Are you still watching?" after 5 min.
+       Clicking continue just… continues the chair.
+       ======================================================================== */
+    const IdleWatcher = {
+        veil: $("idleVeil"),
+        timer: null,
+        init() {
+            $("idleBtn").addEventListener("click", () => this.dismiss());
+            ["mousemove", "keydown", "scroll", "touchstart"].forEach((ev) =>
+                window.addEventListener(ev, () => this.reset(), { passive: true })
+            );
+            this.reset();
+        },
+        reset() {
+            clearTimeout(this.timer);
+            this.veil.classList.remove("active");
+            this.timer = setTimeout(() => this.veil.classList.add("active"), CONFIG.timing.idleAfterMs);
+        },
+        dismiss() {
+            this.veil.classList.remove("active");
+            Toasts.show({ t: "RESUMED", m: "Welcome back. Nothing changed." });
+            this.reset();
+        },
+    };
 
-        // Optional: Refresh the stream image periodically for extra realism
-        // Comment out if you prefer the same image throughout
-        // setInterval(() => {
-        //     const img = document.getElementById('streamImage');
-        //     img.src = STREAM_IMAGE_URL + '&t=' + Date.now();
-        // }, 10000);
+    /* ========================================================================
+       KONAMI CODE  —  the chair "shifts slightly." It does not, really.
+       ======================================================================== */
+    const Konami = {
+        seq: ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"],
+        pos: 0,
+        init() {
+            window.addEventListener("keydown", (e) => {
+                this.pos = (e.key === this.seq[this.pos]) ? this.pos + 1 : 0;
+                if (this.pos === this.seq.length) { this.pos = 0; this.fire(); }
+            });
+        },
+        fire() {
+            const img = $("streamImage");
+            img.style.transform = "translateX(3px)";
+            setTimeout(() => { img.style.transform = ""; }, 200);
+            Toasts.show({ t: "???", m: "Did the chair just move? (No.)" });
+        },
+    };
+
+    /* ========================================================================
+       NEXT-UP RAIL  —  three thumbnails, all the same chair, all "live."
+       ======================================================================== */
+    function buildNextUp() {
+        const grid = $("nextGrid");
+        NEXT_UP.forEach((item) => {
+            const card = document.createElement("div");
+            card.className = "next-card";
+            card.innerHTML =
+                `<div class="next-thumb">
+                    <span class="live-tag">LIVE</span>
+                    <img src="${CONFIG.STREAM_IMAGE_URL}" alt="${escapeHtml(item.title)}">
+                 </div>
+                 <div class="next-title">${escapeHtml(item.title)}</div>
+                 <div class="next-meta">${escapeHtml(item.meta)}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    /* ========================================================================
+       COLD OPEN  —  "Connecting to stream…" then the big anticlimactic reveal.
+       ======================================================================== */
+    function coldOpen(done) {
+        const veil = $("coldOpen");
+        const text = $("coldText");
+        const lines = ["Connecting to stream…", "Negotiating bitrate…", "Locating chair…", "Live."];
+        let i = 0;
+        const step = () => {
+            text.textContent = lines[i];
+            if (++i < lines.length) {
+                setTimeout(step, randInt(550, 850));
+            } else {
+                setTimeout(() => {
+                    veil.classList.add("done");
+                    setTimeout(() => { veil.remove(); done(); }, 600);
+                }, 500);
+            }
+        };
+        // Honor reduced-motion: shorten the wait.
+        prefersReducedMotion ? (text.textContent = "Live.", setTimeout(() => {
+            veil.classList.add("done"); setTimeout(() => { veil.remove(); done(); }, 400);
+        }, 300)) : step();
+    }
+
+    /* ========================================================================
+       BOOT
+       ======================================================================== */
+    function boot() {
+        // Apply the configured image (in case CONFIG was edited but markup wasn't).
+        $("streamImage").src = CONFIG.STREAM_IMAGE_URL;
+
+        ViewerCounter.init();
+        StreamClock.init();
+        WatchTime.init();
+        Telemetry.init();
+        ChatBot.init();
+        Theater.init();
+        Toasts.init();
+        TabState.init();
+        Controls.init();
+        IdleWatcher.init();
+        Konami.init();
+        buildNextUp();
+    }
+
+    // Start with the cold open; everything else begins once it clears.
+    coldOpen(boot);
     </script>
 </body>
 </html>
