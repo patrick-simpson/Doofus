@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infinite Live Stream</title>
 
+    <!-- Deadpan metadata: a shared link should unfurl like a real broadcast. -->
+    <meta name="description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
+    <meta name="theme-color" content="#0b0d10">
+    <link rel="canonical" href="https://doofus.live/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://doofus.live/">
+    <meta property="og:site_name" content="doofus.live">
+    <meta property="og:title" content="● LIVE — an empty chair">
+    <meta property="og:description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="● LIVE — an empty chair">
+    <meta name="twitter:description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop">
+
     <!--
       ============================================================================
        INFINITE LIVE STREAM  —  doofus.live
@@ -483,8 +500,10 @@
                     <!--
                       ============================================================
                        >>> THE STREAM IMAGE <<<
-                       Swap STREAM_IMAGE_URL in the CONFIG block below to change
-                       the subject. This <img> only sets a fallback.
+                       CONFIG.STREAM_IMAGE_URL is the source of truth; boot()
+                       applies it on load. This src is the progressive-enhancement
+                       fallback shown before JS runs (or if it fails). Swap the
+                       subject in the CONFIG block below, not here.
                       ============================================================
                     -->
                     <img id="streamImage" class="video-image"
@@ -593,6 +612,23 @@
     const CONFIG = {
         // >>> The one line most people will want to change: <<<
         STREAM_IMAGE_URL: "https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop",
+
+        // If the image above ever 404s or rate-limits, the joke must not die.
+        // This inline SVG chair is the last line of defense — zero network,
+        // styled to match the room. boot() swaps it in on image error.
+        FALLBACK_IMAGE: "data:image/svg+xml;utf8," + encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+                <rect width="1280" height="720" fill="#0b0d10"/>
+                <g stroke="#3a3f47" stroke-width="12" stroke-linecap="round" fill="none">
+                    <path d="M565 250 L565 432"/><path d="M715 250 L715 432"/>
+                    <path d="M565 286 L715 286"/><path d="M565 330 L715 330"/>
+                    <path d="M540 432 L742 432"/>
+                    <path d="M560 432 L560 562"/><path d="M722 432 L722 562"/>
+                </g>
+                <text x="640" y="652" fill="#474d56" font-family="monospace"
+                      font-size="24" text-anchor="middle" letter-spacing="3">CHAIR · NATIVE</text>
+            </svg>`
+        ),
 
         // What is being broadcast (used in copy throughout). Keep it mundane.
         SUBJECT: "an empty chair",
@@ -749,12 +785,29 @@
         "this changes nothing", "nothing changes when there's a chair",
         "the only constant is the chair", "and taxes", "and the chair",
         "three certainties", "death", "taxes", "the chair", "oh god the chair",
+        "checked back after a year", "still here", "of course it is",
+        "i muted it but i kept it on", "we all did", "background radiation",
+        "load-bearing wallpaper", "my second monitor is just this",
+        "productivity is up", "unclear whose", "the chair's probably",
+        "logged 14 hours this week", "rookie numbers", "i'm at 40",
+        "do you think it knows we're here", "it does not", "good",
+        "the silence is load-bearing", "structurally sound silence",
+        "i described this to a friend", "they stopped texting back",
+        "worth it though", "always worth it", "the chair agrees",
+        "it doesn't agree it's a chair", "let me have this",
+        "buffered for two seconds there", "tension was unbearable",
+        "resolved identically", "the only stream where nothing spoils",
+        "no spoilers possible", "the ending is the chair", "i'm okay with that",
+        "checked the wiki", "there is no wiki", "i'll start one",
+        "first edit: 'a chair'", "second edit: 'still'", "lock the page",
     ];
 
     // Lines that trigger a deadpan moderator timeout for impatience.
     const IMPATIENT_LINES = [
         "when does something happen", "ok but when does it START",
         "is anything going to happen or", "how long until something happens",
+        "can a mod confirm something is coming", "is this on a loop or",
+        "refresh or is it just me", "skip to the good part",
     ];
 
     const SUPERCHATS = [
@@ -765,6 +818,10 @@
         { amt: "$3",  text: "thank you for your service" },
         { amt: "$20", text: "my accountant says this is a business expense" },
         { amt: "$7",  text: "for the chair" },
+        { amt: "$4",  text: "no further questions" },
+        { amt: "$15", text: "this is the most stable thing in my life" },
+        { amt: "$2",  text: "tell the chair i said hi" },
+        { amt: "$9",  text: "refund not requested" },
     ];
 
     const CHYRON_PLACES = [
@@ -772,17 +829,24 @@
         "A waiting area · Slough", "Somewhere in Ohio", "A kitchen · Wuppertal",
         "A back office · Bakersfield", "A hallway · Hull", "A study · Toledo",
         "An undisclosed living room", "A breakroom · Indianapolis",
+        "A spare office · Adelaide", "A guest room · Tromsø",
+        "A landing · Stoke", "A converted garage · Fresno",
+        "A reception area · Limerick", "A study nook · Utrecht",
     ];
 
     const WATCH_REGIONS = [
         "🇬🇧 Slough", "🇺🇸 Ohio", "🇨🇦 Saskatchewan", "🇩🇪 Wuppertal",
         "🇧🇪 Belgium", "🇳🇿 a sheep farm", "🇦🇺 Wagga Wagga", "🇮🇪 Cork",
         "🇳🇱 a houseboat", "🇫🇮 somewhere quiet",
+        "🇸🇪 a basement", "🇯🇵 a vending corner", "🇵🇹 a tiled hallway",
+        "🇳🇴 a fjord, allegedly", "🇮🇸 a lighthouse", "🇨🇭 a punctual room",
     ];
 
     const RAID_PARTIES = [
         "RegionalFurnitureCo", "the_other_chair_stream", "AmbientNoiseFans",
         "PeopleWhoOwnDesks", "the_waiting_room", "MildlyInteresting",
+        "the_other_other_chair", "StandingDeskHoldouts", "LobbyCamEnjoyers",
+        "EmptyParkingLotTV", "the_hold_music_appreciation_society",
     ];
 
     const BREAKING_LINES = [
@@ -791,6 +855,10 @@
         "No change. Experts say this is consistent with previous footage.",
         "Sources confirm the chair has not moved. More as it fails to develop.",
         "Update: still a chair. Authorities are not involved and will not be.",
+        "Developing: nothing. We go now to our correspondent, who has nothing.",
+        "A spokesperson for the chair declined to comment, as it is a chair.",
+        "Markets unmoved by the chair remaining exactly where it was.",
+        "Weather permitting, the chair is expected to continue existing.",
     ];
 
     const ACHIEVEMENTS = [
@@ -801,9 +869,13 @@
         { t: "ACHIEVEMENT", m: "The chair noticed nothing." },
         { t: "MILESTONE",   m: "You and the chair have an understanding now." },
         { t: "ACHIEVEMENT", m: "Out-waited a piece of furniture." },
+        { t: "ACHIEVEMENT", m: "Five minutes. The chair did not blink. Neither did you." },
+        { t: "MILESTONE",   m: "Long enough to have a favorite leg." },
+        { t: "ACHIEVEMENT", m: "You closed other tabs for this." },
+        { t: "ACHIEVEMENT", m: "Nothing happened, on schedule." },
     ];
 
-    const EMOTES = ["🪑", "👀", "❤️", "🫠"];
+    const EMOTES = ["🪑", "👀", "❤️", "🫠", "🕯️", "🛋️"];
 
     /* ========================================================================
        UTILITIES
@@ -817,9 +889,11 @@
         window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Schedule a repeating action with a *random* gap each time (deadpan rhythm).
+    // Skips the work while the tab is hidden — keeps rescheduling so the cadence
+    // resumes naturally, but doesn't churn the DOM or burn battery in the dark.
     function loop(rangeMs, fn) {
         const next = () => {
-            fn();
+            if (!document.hidden) fn();
             setTimeout(next, randInt(rangeMs[0], rangeMs[1]));
         };
         setTimeout(next, randInt(rangeMs[0], rangeMs[1]));
@@ -879,6 +953,7 @@
             setInterval(() => this.tick(), 1000);
         },
         tick() {
+            if (document.hidden) return;  // recomputed from Date.now() on return
             const now = new Date();
             this.tsEl.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
@@ -898,6 +973,7 @@
         start: Date.now(),
         init() { setInterval(() => this.tick(), 1000); },
         tick() {
+            if (document.hidden) return;  // recomputed from Date.now() on return
             let s = Math.floor((Date.now() - this.start) / 1000);
             const h = Math.floor(s / 3600); s -= h * 3600;
             const m = Math.floor(s / 60);    s -= m * 60;
@@ -919,6 +995,7 @@
             setInterval(() => this.tick(), 1800);
         },
         tick() {
+            if (document.hidden) return;  // no point churning telemetry in the dark
             // Twitch the signal bars.
             for (const bar of this.bars) {
                 bar.style.opacity = Math.random() < 0.22 ? "0.25" : "0.9";
@@ -1091,6 +1168,7 @@
         init() {
             this.setFavicon();
             setInterval(() => {
+                if (document.hidden) return;
                 document.title = `● LIVE — ${ViewerCounter.count.toLocaleString()} watching`;
             }, 2000);
         },
@@ -1248,7 +1326,11 @@
        ======================================================================== */
     function boot() {
         // Apply the configured image (in case CONFIG was edited but markup wasn't).
-        $("streamImage").src = CONFIG.STREAM_IMAGE_URL;
+        // Wire the fallback first, and clear it inside the handler so a broken
+        // fallback can't loop. If the network image dies, the chair stays.
+        const img = $("streamImage");
+        img.onerror = () => { img.onerror = null; img.src = CONFIG.FALLBACK_IMAGE; };
+        img.src = CONFIG.STREAM_IMAGE_URL;
 
         ViewerCounter.init();
         StreamClock.init();

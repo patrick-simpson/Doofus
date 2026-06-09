@@ -1,0 +1,21 @@
+name: lint
+
+# Minimal HTML sanity check. Adds nothing to the deployed site — no runtime
+# dependencies — it just keeps index.html well-formed on pull requests.
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - ".htmlhintrc"
+      - ".github/workflows/lint.yml"
+  workflow_dispatch:
+
+jobs:
+  htmlhint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npx --yes htmlhint index.html
