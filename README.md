@@ -15,13 +15,18 @@ no dependencies, no bundler, no framework. Open it in a browser and it runs.
 Everything you see is generated client-side from a handful of constants and
 copy arrays:
 
-- **Visuals** (CRT scanlines, badges, chyron, overlays) are CSS.
+- **Visuals** are CSS, styled as a small public-access TV station: an ON AIR
+  sign, a solid-block lower-third, a station bug, a yellow bulletin ticker,
+  SMPTE color bars on the cold open, CRT scanlines. Hard edges, no glow.
+- **Type** is Archivo (its width axis supplies the condensed broadcast
+  headlines) and IBM Plex Mono for the engineering readouts, both from
+  Google Fonts with system fallbacks.
 - **Behavior** (chat, viewer drift, telemetry, theater, toasts, idle nag,
   Konami easter egg) is vanilla ES6 organized into small self-contained
   modules at the bottom of the file.
 - The **room tone** is a refrigerator hum synthesized with the Web Audio API,
   and the **favicon** is drawn on a `<canvas>` at runtime — so there are no
-  external asset files to manage.
+  asset files to manage.
 
 The stream image is a single URL. If it ever fails to load, an inline SVG chair
 takes over so the joke can't break.

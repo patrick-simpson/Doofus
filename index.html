@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Live Stream</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>doofus.live — an empty chair, live</title>
 
     <!-- Deadpan metadata: a shared link should unfurl like a real broadcast. -->
     <meta name="description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
-    <meta name="theme-color" content="#0b0d10">
+    <meta name="theme-color" content="#0e0d0b">
+    <meta name="color-scheme" content="dark">
     <link rel="canonical" href="https://doofus.live/">
 
     <meta property="og:type" content="website">
@@ -22,6 +23,11 @@
     <meta name="twitter:description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop">
 
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
     <!--
       ============================================================================
        INFINITE LIVE STREAM  —  doofus.live
@@ -29,93 +35,104 @@
        It is a single static image of an empty chair. Nothing ever happens.
        Everything below is theater. The punchline is the silence.
 
+       Visual language: a small public-access TV station. Hard edges, solid
+       blocks, condensed type, lower-thirds, color bars. No glow, no cards.
+
        To reskin the whole joke, edit the CONFIG block in the <script> tag.
       ============================================================================
     -->
 
     <style>
         /* ====================================================================
-           THEME — muted, monochrome, deadpan. Restraint is the joke.
+           THEME — station graphics package. Warm black, newsprint white,
+           one broadcast red, one bulletin yellow. Nothing else.
            ==================================================================== */
         :root {
-            --bg:        #0b0d10;
-            --panel:     #121519;
-            --panel-2:   #0e1114;
-            --line:      #232830;
-            --text:      #c7ccd1;
-            --text-dim:  #6b7280;
-            --text-dimmer:#474d56;
-            --live:      #d83a3a;
-            --accent:    #3a3f47;
-            --mono: "SFMono-Regular", "Courier New", ui-monospace, Menlo, Consolas, monospace;
+            --ink:        #0e0d0b;
+            --ink-2:      #161512;
+            --ink-3:      #1f1d19;
+            --rule:       #2b2924;
+            --paper:      #ece7dc;
+            --paper-dim:  #a29d91;
+            --paper-faint:#625e55;
+            --red:        #e0301e;
+            --yellow:     #f2c230;
+
+            --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+            --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+            --mast-h: 56px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            font-family: var(--mono);
-            color: var(--text);
-            letter-spacing: 0.3px;
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.45;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
+        button, select { font: inherit; color: inherit; }
+        :focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 
-        /* ---- App layout: player + chat side by side, stacks on mobile ---- */
-        .app {
-            display: flex;
-            gap: 16px;
-            width: 100%;
-            max-width: 1180px;
-            align-items: stretch;
-        }
-        .stage { flex: 1 1 auto; min-width: 0; }
+        .mono { font-family: var(--mono); }
+        .tabular { font-variant-numeric: tabular-nums; }
 
         /* ====================================================================
-           PLAYER SHELL
+           MASTHEAD — the station ident
            ==================================================================== */
-        .player {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+        .masthead {
+            height: var(--mast-h);
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 20px;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--rule);
         }
-
-        .player-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 10px 14px;
-            background: var(--panel-2);
-            border-bottom: 1px solid var(--line);
-            font-size: 12px;
+        .ident { display: flex; align-items: center; gap: 18px; }
+        .wordmark {
+            font-weight: 850; font-stretch: 115%;
+            font-size: 23px; letter-spacing: -0.035em; line-height: 1;
+            color: var(--paper); text-decoration: none;
         }
-        .header-left { display: flex; align-items: center; gap: 10px; }
+        .wordmark .tld { color: var(--paper-faint); font-weight: 500; letter-spacing: -0.01em; }
 
-        .live-indicator { display: flex; align-items: center; gap: 7px; }
+        /* A physical "ON AIR" sign, not a glowing dot */
+        .on-air {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-family: var(--mono); font-weight: 600;
+            font-size: 10.5px; letter-spacing: 0.16em;
+            color: var(--red);
+            border: 1.5px solid var(--red);
+            padding: 3px 8px 3px 7px;
+        }
         .live-dot {
-            width: 9px; height: 9px; border-radius: 50%;
-            background: var(--live);
-            box-shadow: 0 0 6px var(--live);
-            animation: pulse 1.6s ease-in-out infinite;
+            width: 7px; height: 7px; background: var(--red); border-radius: 50%;
+            animation: pulse 2s steps(2, jump-none) infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50%      { opacity: 0.35; }
+        @keyframes pulse { 50% { opacity: 0.25; } }
+
+        .mast-meta {
+            display: flex; align-items: center; gap: 22px;
+            font-family: var(--mono); font-size: 12px; color: var(--paper-dim);
+            white-space: nowrap;
         }
-        .live-text {
-            font-weight: 700; font-size: 12px; letter-spacing: 2px;
-            color: var(--live);
+        .mast-meta b { color: var(--paper); font-weight: 500; }
+
+        /* ====================================================================
+           LAYOUT — broadcast monitor on the left, chat rail on the right
+           ==================================================================== */
+        .app {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            min-height: calc(100vh - var(--mast-h));
         }
-        .header-sep { color: var(--text-dimmer); }
-        .watching-from { color: var(--text-dim); }
-        .viewer-count { color: var(--text); font-variant-numeric: tabular-nums; }
-        .viewer-count .label { color: var(--text-dim); }
+        .stage {
+            padding: 24px 32px 48px;
+            border-right: 1px solid var(--rule);
+            min-width: 0;
+        }
 
         /* ====================================================================
            VIDEO AREA  +  OVERLAYS
@@ -128,94 +145,108 @@
         }
         .video-image {
             width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.18s ease, filter 1s linear;
+            object-fit: cover; display: block;
+            filter: saturate(0.88) contrast(1.03);
+            transition: transform 0.18s ease;
         }
 
-        /* ---- CRT overlay: scanlines, vignette, faint flicker ---- */
+        /* ---- CRT texture: scanlines + vignette, faint flicker ---- */
         .crt {
             position: absolute; inset: 0; pointer-events: none;
             background:
-                radial-gradient(120% 120% at 50% 50%, transparent 60%, rgba(0,0,0,0.45) 100%),
-                repeating-linear-gradient(
-                    to bottom,
-                    rgba(255,255,255,0.03) 0px,
-                    rgba(255,255,255,0.03) 1px,
-                    transparent 1px,
-                    transparent 3px
-                );
+                radial-gradient(130% 120% at 50% 45%, transparent 55%, rgba(0,0,0,0.5) 100%),
+                repeating-linear-gradient(to bottom,
+                    rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);
             mix-blend-mode: screen;
-            animation: flicker 5s steps(60) infinite;
+            animation: flicker 6s steps(60) infinite;
         }
         @keyframes flicker {
-            0%, 97%, 100% { opacity: 0.5; }
-            98%           { opacity: 0.38; }
-            99%           { opacity: 0.6; }
+            0%, 97%, 100% { opacity: 0.55; }
+            98%           { opacity: 0.4; }
+            99%           { opacity: 0.65; }
         }
 
         /* ---- Burned-in security-cam timestamp (top-left) ---- */
         .timestamp {
-            position: absolute; top: 10px; left: 12px;
-            font-size: 12px; color: rgba(235,235,235,0.85);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+            position: absolute; top: 16px; left: 18px;
+            font-family: var(--mono); font-size: 13px; font-weight: 500;
+            color: rgba(255,255,255,0.88);
+            text-shadow: 0 1px 0 rgba(0,0,0,0.7);
             font-variant-numeric: tabular-nums;
             pointer-events: none;
         }
-        .timestamp .rec-dot { color: var(--live); }
+        .timestamp .rec-dot { color: var(--red); }
 
-        /* ---- Quality / format badges (top-right) ---- */
+        /* ---- Tech readout (top-right): plain text, no pills ---- */
         .badges {
-            position: absolute; top: 10px; right: 12px;
-            display: flex; gap: 6px; pointer-events: none;
-        }
-        .badge {
-            font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-            padding: 2px 6px; border-radius: 3px;
-            background: rgba(0,0,0,0.55); color: #d7dbe0;
-            border: 1px solid rgba(255,255,255,0.12);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-        }
-
-        /* ---- Signal-strength bars (under badges) ---- */
-        .signal {
-            position: absolute; top: 34px; right: 12px;
-            display: flex; align-items: flex-end; gap: 2px; height: 14px;
+            position: absolute; top: 16px; right: 18px;
+            display: flex; align-items: center; gap: 12px;
+            font-family: var(--mono); font-size: 11px; font-weight: 500;
+            letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.8);
+            text-shadow: 0 1px 0 rgba(0,0,0,0.7);
             pointer-events: none;
         }
-        .signal span {
-            width: 3px; background: rgba(235,235,235,0.85);
-            border-radius: 1px; transition: opacity 0.4s, height 0.4s;
-        }
+        .signal { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+        .signal span { width: 3px; background: rgba(255,255,255,0.85); transition: opacity 0.4s; }
         .signal span:nth-child(1){ height: 4px; }
-        .signal span:nth-child(2){ height: 7px; }
-        .signal span:nth-child(3){ height: 10px; }
-        .signal span:nth-child(4){ height: 14px; }
+        .signal span:nth-child(2){ height: 6px; }
+        .signal span:nth-child(3){ height: 9px; }
+        .signal span:nth-child(4){ height: 12px; }
 
-        /* ---- Lower-third chyron ---- */
-        .chyron {
-            position: absolute; left: 0; right: 0; bottom: 0;
-            padding: 10px 14px;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-            font-size: 12px; color: rgba(235,235,235,0.9);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+        /* ---- Lower-third: solid blocks, like real station graphics ---- */
+        .lower-third {
+            position: absolute; left: 22px; bottom: 46px;
+            display: flex; align-items: stretch;
+            pointer-events: none;
+            box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+        }
+        .lt-tag {
+            display: flex; align-items: center;
+            background: var(--red); color: #fff;
+            font-weight: 850; font-stretch: 75%;
+            font-size: 15px; letter-spacing: 0.06em;
+            padding: 0 11px;
+        }
+        .lt-body {
+            display: flex; flex-direction: column; justify-content: center;
+            background: var(--paper); color: var(--ink);
+            padding: 6px 14px 7px 12px;
+        }
+        .lt-title {
+            font-weight: 850; font-stretch: 72%;
+            font-size: 22px; line-height: 1; text-transform: uppercase;
+            letter-spacing: 0.005em;
+        }
+        .lt-sub {
+            font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+            line-height: 1.2; margin-top: 3px; color: #3c3933;
+        }
+
+        /* ---- Station bug, bottom-right, where it always is ---- */
+        .bug {
+            position: absolute; right: 20px; bottom: 50px;
+            font-weight: 850; font-stretch: 115%;
+            font-size: 17px; letter-spacing: -0.035em;
+            color: rgba(255,255,255,0.5);
             pointer-events: none;
         }
-        .chyron .accent { color: var(--live); font-weight: 700; }
 
         /* ---- Buffering overlay (occasionally "loads" the same frame) ---- */
         .buffering {
             position: absolute; inset: 0;
             display: none; flex-direction: column;
-            align-items: center; justify-content: center; gap: 12px;
-            background: rgba(0,0,0,0.55); color: #cfd3d8; font-size: 12px;
+            align-items: center; justify-content: center; gap: 14px;
+            background: rgba(0,0,0,0.5);
+            font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em;
+            color: var(--paper);
             pointer-events: none;
         }
         .buffering.active { display: flex; }
         .spinner {
-            width: 34px; height: 34px; border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.18);
-            border-top-color: rgba(255,255,255,0.8);
+            width: 30px; height: 30px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-top-color: var(--paper);
             animation: spin 0.9s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -223,10 +254,10 @@
         /* ---- "Signal lost" static burst ---- */
         .static {
             position: absolute; inset: 0; display: none;
-            background-color: #111;
+            background-color: #121212;
             background-image:
-                repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 4px),
-                repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 4px);
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 4px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 2px, transparent 2px 4px);
             pointer-events: none;
         }
         .static.active { display: block; animation: staticShift 0.08s steps(2) infinite; }
@@ -237,24 +268,33 @@
         .static-label {
             position: absolute; inset: 0; display: flex;
             align-items: center; justify-content: center;
-            font-size: 12px; letter-spacing: 2px; color: #9aa0a6;
+        }
+        .static-label span {
+            background: #000; color: var(--paper);
+            font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+            padding: 6px 12px;
         }
 
-        /* ---- Breaking-news banner ---- */
+        /* ---- Breaking-news ticker, pinned to the bottom edge ---- */
         .breaking {
-            position: absolute; left: 0; right: 0; bottom: 44px;
-            display: none; align-items: center;
-            background: rgba(0,0,0,0.78);
-            border-top: 1px solid rgba(216,58,58,0.6);
-            font-size: 12px; overflow: hidden; white-space: nowrap;
+            position: absolute; left: 0; right: 0; bottom: 0; height: 30px;
+            display: none; align-items: stretch;
+            background: var(--ink);
+            overflow: hidden; white-space: nowrap;
         }
         .breaking.active { display: flex; }
         .breaking .tag {
-            background: var(--live); color: #fff; font-weight: 700;
-            padding: 4px 8px; letter-spacing: 1px; flex: none;
+            display: flex; align-items: center; flex: none;
+            background: var(--yellow); color: var(--ink);
+            font-weight: 850; font-stretch: 75%;
+            font-size: 14px; letter-spacing: 0.08em;
+            padding: 0 12px;
+            position: relative; z-index: 1;
         }
         .breaking .crawl {
-            padding: 4px 0; color: #e6e8eb;
+            display: flex; align-items: center;
+            padding-left: 14px; color: var(--paper);
+            font-weight: 600; font-size: 13.5px;
             animation: crawl 18s linear infinite;
         }
         @keyframes crawl {
@@ -262,39 +302,44 @@
             to   { transform: translateX(-100%); }
         }
 
-        /* ---- "Are you still watching?" idle overlay ---- */
+        /* ---- "Are you still watching?" ---- */
         .idle-veil {
             position: absolute; inset: 0; display: none;
             flex-direction: column; align-items: center; justify-content: center;
-            gap: 16px; text-align: center;
-            background: rgba(6,8,10,0.92);
+            gap: 14px; text-align: center;
+            background: rgba(10,9,8,0.94);
             padding: 24px;
         }
         .idle-veil.active { display: flex; }
-        .idle-veil h2 { font-size: 18px; font-weight: 600; color: var(--text); }
-        .idle-veil p  { font-size: 12px; color: var(--text-dim); max-width: 320px; }
-        .idle-btn {
-            font-family: var(--mono); font-size: 13px;
-            padding: 9px 18px; border-radius: 5px; cursor: pointer;
-            background: #1c2026; color: var(--text);
-            border: 1px solid var(--line);
+        .idle-veil h2 {
+            font-weight: 800; font-stretch: 75%;
+            font-size: 34px; line-height: 1; letter-spacing: -0.005em;
         }
-        .idle-btn:hover { background: #232830; }
+        .idle-veil p  { font-size: 14px; color: var(--paper-dim); max-width: 34ch; }
+        .idle-btn {
+            margin-top: 6px;
+            font-weight: 700; font-size: 14px;
+            padding: 10px 20px; cursor: pointer;
+            background: var(--paper); color: var(--ink);
+            border: 0;
+        }
+        .idle-btn:hover { background: #fff; }
 
-        /* ---- Raid banner (rare, flat) ---- */
+        /* ---- Raid banner ---- */
         .raid {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            display: none; padding: 10px 16px; border-radius: 6px;
-            background: rgba(6,8,10,0.85); border: 1px solid var(--line);
-            font-size: 13px; color: var(--text); text-align: center;
+            display: none; padding: 10px 16px;
+            background: var(--paper); color: var(--ink);
+            font-weight: 600; font-size: 14px; text-align: center;
+            border-left: 4px solid var(--red);
         }
         .raid.active { display: block; }
 
         /* ---- Floating emote layer (used very sparingly) ---- */
         .emote-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
         .emote {
-            position: absolute; bottom: 56px; font-size: 20px; opacity: 0;
+            position: absolute; bottom: 90px; font-size: 22px; opacity: 0;
             animation: floatUp 4s ease-out forwards;
         }
         @keyframes floatUp {
@@ -304,162 +349,294 @@
         }
 
         /* ====================================================================
-           CONTROLS  (mostly inert; volume + fullscreen actually work)
+           TRANSPORT BAR  (mostly inert; volume, share, fullscreen work)
            ==================================================================== */
         .controls {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px;
-            background: var(--panel-2);
-            border-top: 1px solid var(--line);
+            display: flex; align-items: center; gap: 4px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--rule);
         }
         .ctrl {
-            width: 32px; height: 32px; flex: none;
-            display: flex; align-items: center; justify-content: center;
-            background: transparent; color: var(--text-dim);
-            border: 1px solid transparent; border-radius: 5px;
-            font-size: 14px; cursor: default;
-            font-family: var(--mono);
+            width: 36px; height: 36px; flex: none;
+            display: grid; place-items: center;
+            background: none; border: 0; color: var(--paper-faint);
+            cursor: not-allowed;
         }
-        .ctrl.live-clickable { cursor: pointer; color: var(--text); }
-        .ctrl.live-clickable:hover { background: #1c2026; }
+        .ctrl svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: square; stroke-linejoin: miter; }
+        .ctrl.live-clickable { cursor: pointer; color: var(--paper); }
+        .ctrl.live-clickable:hover { background: var(--ink-3); }
+        #volumeBtn .ic-on { display: none; }
+        #volumeBtn.is-on .ic-on { display: block; }
+        #volumeBtn.is-on .ic-off { display: none; }
+
         .progress {
-            flex: 1 1 auto; height: 4px; border-radius: 2px;
-            background: #20252c; position: relative; cursor: default;
+            flex: 1 1 auto; height: 3px; margin: 0 12px;
+            background: var(--red); position: relative; cursor: not-allowed;
         }
         .progress::after {
-            content: ""; position: absolute; left: 0; top: 0; bottom: 0;
-            width: 100%; border-radius: 2px;
-            background: rgba(216,58,58,0.5);
+            content: ""; position: absolute; right: -4px; top: 50%;
+            width: 9px; height: 9px; margin-top: -4.5px;
+            background: var(--red); border-radius: 50%;
         }
         .live-pill {
-            font-size: 10px; font-weight: 700; letter-spacing: 1px;
-            color: var(--live); border: 1px solid rgba(216,58,58,0.5);
-            border-radius: 3px; padding: 2px 6px; flex: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.12em; color: var(--paper);
+            padding: 0 10px 0 4px; flex: none;
         }
+        .live-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
         .quality-select {
-            font-family: var(--mono); font-size: 11px;
-            background: #1c2026; color: var(--text);
-            border: 1px solid var(--line); border-radius: 5px;
-            padding: 5px 6px; cursor: pointer;
+            font-family: var(--mono); font-size: 12px;
+            background: var(--ink); color: var(--paper);
+            border: 1px solid var(--rule); border-radius: 0;
+            padding: 6px 8px; margin: 0 6px; cursor: pointer;
         }
 
         /* ====================================================================
-           FOOTER STAT STRIP
+           PROGRAM INFO — what's on
+           ==================================================================== */
+        .program { padding-top: 26px; }
+        .eyebrow {
+            font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--red);
+        }
+        .program h1 {
+            margin-top: 8px;
+            font-weight: 800; font-stretch: 70%;
+            font-size: clamp(38px, 4.6vw, 64px);
+            line-height: 0.92; letter-spacing: -0.01em;
+        }
+        .program-meta {
+            margin-top: 14px;
+            display: flex; flex-wrap: wrap; gap: 4px 22px;
+            font-size: 14px; color: var(--paper-dim);
+        }
+        .program-meta b { color: var(--paper); font-weight: 600; }
+        .program-desc {
+            margin-top: 16px; max-width: 60ch;
+            font-size: 15.5px; line-height: 1.55; color: var(--paper-dim);
+        }
+        .program-desc em { color: var(--paper); font-style: normal; }
+
+        /* ====================================================================
+           TELEMETRY — an engineering readout, not a stat strip
            ==================================================================== */
         .stats {
-            display: flex; flex-wrap: wrap; gap: 4px 18px;
-            padding: 9px 14px;
-            background: var(--panel);
-            border-top: 1px solid var(--line);
-            font-size: 11px; color: var(--text-dim);
+            margin-top: 30px;
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+            border-top: 1px solid var(--rule);
         }
-        .stats b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+        .stats > div {
+            padding: 14px 16px 14px 0;
+            border-bottom: 1px solid var(--rule);
+        }
+        .stats > div:not(:nth-child(3n+1)) { padding-left: 16px; border-left: 1px solid var(--rule); }
+        .stats dt {
+            font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--paper-faint);
+        }
+        .stats dd {
+            margin-top: 4px;
+            font-family: var(--mono); font-size: 17px; font-weight: 500;
+            font-variant-numeric: tabular-nums; color: var(--paper);
+        }
+
+        .colophon {
+            margin-top: 28px;
+            font-family: var(--mono); font-size: 11px; line-height: 1.6;
+            color: var(--paper-faint); max-width: 70ch;
+        }
 
         /* ====================================================================
-           CHAT COLUMN
+           CHAT RAIL
            ==================================================================== */
         .chat {
-            flex: 0 0 300px;
+            position: sticky; top: 0;
+            height: calc(100vh - var(--mast-h));
             display: flex; flex-direction: column;
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            overflow: hidden;
+            background: var(--ink-2);
         }
         .chat-header {
-            padding: 10px 14px; font-size: 12px; color: var(--text-dim);
-            border-bottom: 1px solid var(--line);
+            height: 52px; flex: none;
+            padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--rule);
         }
-        .chat-header .title { color: var(--text); letter-spacing: 1px; }
+        .chat-header .title { font-weight: 700; font-size: 14px; }
+        .chat-header .count { font-family: var(--mono); font-size: 11.5px; color: var(--paper-faint); }
+        .chat-pinned {
+            flex: none;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--rule);
+            font-size: 13px; line-height: 1.45; color: var(--paper-dim);
+        }
+        .chat-pinned b {
+            display: block;
+            font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--paper-faint); margin-bottom: 3px;
+        }
         .chat-body {
-            flex: 1 1 auto; overflow-y: auto; padding: 10px 12px;
-            display: flex; flex-direction: column; gap: 7px;
-            min-height: 280px;
+            flex: 1 1 auto; overflow-y: auto;
+            padding: 14px 20px;
+            display: flex; flex-direction: column; gap: 9px;
+            scrollbar-width: thin; scrollbar-color: var(--rule) transparent;
         }
-        .chat-body::-webkit-scrollbar { width: 8px; }
-        .chat-body::-webkit-scrollbar-thumb { background: #232830; border-radius: 4px; }
-        .msg { font-size: 12px; line-height: 1.45; word-wrap: break-word; }
-        .msg .user { font-weight: 700; }
-        .msg .text { color: var(--text); }
-        .msg.system { color: var(--text-dimmer); font-style: italic; }
+        .chat-body > :first-child { margin-top: auto; }
+        .msg { font-size: 13.5px; line-height: 1.45; overflow-wrap: anywhere; }
+        .msg .user { font-weight: 650; margin-right: 6px; }
+        .msg .text { color: var(--paper); }
+        .msg.system {
+            font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
+            color: var(--paper-faint);
+        }
         .msg.super {
-            background: rgba(216,58,58,0.10);
-            border: 1px solid rgba(216,58,58,0.35);
-            border-radius: 5px; padding: 6px 8px;
+            border-left: 3px solid var(--red);
+            background: rgba(224,48,30,0.07);
+            padding: 8px 10px 9px 11px;
         }
-        .msg.super .user { color: var(--live); }
+        .msg.super .user { color: var(--paper); }
+        .msg.super b {
+            font-family: var(--mono); font-weight: 600; font-size: 12px;
+            background: var(--red); color: #fff; padding: 1px 5px; margin-left: 2px;
+        }
+        .msg.super .text { display: block; margin-top: 4px; color: var(--paper-dim); }
         .chat-input {
-            display: flex; gap: 8px; padding: 10px 12px;
-            border-top: 1px solid var(--line);
+            flex: none;
+            display: flex; gap: 8px; padding: 14px 20px 18px;
+            border-top: 1px solid var(--rule);
         }
         .chat-input input {
-            flex: 1 1 auto; font-family: var(--mono); font-size: 12px;
-            background: #0e1114; color: var(--text-dim);
-            border: 1px solid var(--line); border-radius: 5px;
-            padding: 7px 9px;
+            flex: 1 1 auto; min-width: 0;
+            font-family: var(--sans); font-size: 13.5px;
+            background: var(--ink); color: var(--paper-dim);
+            border: 1px solid var(--rule); border-radius: 0;
+            padding: 9px 11px;
         }
-        .chat-input input::placeholder { color: var(--text-dimmer); }
+        .chat-input input::placeholder { color: var(--paper-faint); }
         .chat-input button {
-            font-family: var(--mono); font-size: 12px;
-            background: #1c2026; color: var(--text-dim);
-            border: 1px solid var(--line); border-radius: 5px;
-            padding: 7px 12px; cursor: default;
+            font-weight: 700; font-size: 13px;
+            background: var(--ink-3); color: var(--paper-faint);
+            border: 0; padding: 0 14px; cursor: not-allowed;
         }
-
 
         /* ====================================================================
-           TOASTS (achievements — dry one-liners)
+           TOASTS — printed slips, not glass
            ==================================================================== */
         .toasts {
-            position: fixed; bottom: 18px; right: 18px;
+            position: fixed; bottom: 20px; left: 20px;
             display: flex; flex-direction: column; gap: 8px;
             z-index: 50;
         }
         .toast {
-            background: var(--panel); border: 1px solid var(--line);
-            border-left: 3px solid var(--accent);
-            border-radius: 6px; padding: 10px 14px; max-width: 280px;
-            font-size: 12px; color: var(--text);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--paper); color: var(--ink);
+            border-left: 4px solid var(--red);
+            padding: 10px 16px 11px 13px; max-width: 300px;
+            font-size: 13.5px; font-weight: 500; line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.45);
             animation: toastIn 0.25s ease, toastOut 0.4s ease 4.4s forwards;
         }
-        .toast .toast-title { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 2px; }
-        @keyframes toastIn  { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
-        @keyframes toastOut { to { opacity: 0; transform: translateX(20px); } }
+        .toast .toast-title {
+            font-family: var(--mono); font-size: 10px; font-weight: 600;
+            letter-spacing: 0.14em; color: #6d6860; margin-bottom: 2px;
+        }
+        @keyframes toastIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
 
         /* ====================================================================
-           COLD-OPEN ("Connecting to stream…")
+           COLD OPEN — SMPTE color bars + "please stand by"
            ==================================================================== */
         .cold-open {
             position: fixed; inset: 0; z-index: 100;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 18px;
-            background: var(--bg);
+            display: grid; grid-template-rows: 67fr 8fr 25fr;
+            background: #000;
             transition: opacity 0.6s ease;
         }
         .cold-open.done { opacity: 0; pointer-events: none; }
-        .cold-spinner {
-            width: 26px; height: 26px; border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.15);
-            border-top-color: rgba(255,255,255,0.7);
-            animation: spin 0.9s linear infinite;
+        .bars-top {
+            background: linear-gradient(to right,
+                #c0c0c0 0 14.2857%, #c0c000 0 28.5714%, #00c0c0 0 42.857%,
+                #00c000 0 57.143%,  #c000c0 0 71.428%,  #c00000 0 85.714%, #0000c0 0);
         }
-        .cold-text { font-size: 13px; color: var(--text-dim); letter-spacing: 1px; }
+        .bars-mid {
+            background: linear-gradient(to right,
+                #0000c0 0 14.2857%, #131313 0 28.5714%, #c000c0 0 42.857%,
+                #131313 0 57.143%,  #00c0c0 0 71.428%,  #131313 0 85.714%, #c0c0c0 0);
+        }
+        .bars-low {
+            background: linear-gradient(to right,
+                #00214c 0 17.86%, #fff 0 35.72%, #32006a 0 53.58%,
+                #131313 0 76.2%, #090909 0 80.95%, #131313 0 85.7%, #1d1d1d 0 90.45%, #131313 0);
+        }
+        .stand-by {
+            position: absolute; left: 50%; top: 40%;
+            transform: translate(-50%, -50%);
+            background: #000; color: #fff;
+            padding: 16px 26px 14px;
+            text-align: center; min-width: 280px;
+        }
+        .stand-by strong {
+            display: block;
+            font-weight: 850; font-stretch: 75%;
+            font-size: 30px; line-height: 1; letter-spacing: 0.04em;
+        }
+        .cold-text {
+            margin-top: 8px;
+            font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+            color: #b9b9b9;
+        }
 
         /* ====================================================================
-           RESPONSIVE — chat drops below the player on narrow screens
+           RESPONSIVE
            ==================================================================== */
-        @media (max-width: 860px) {
-            .app { flex-direction: column; }
-            .chat { flex-basis: auto; }
-            .chat-body { min-height: 200px; max-height: 260px; }
+        @media (max-width: 1100px) {
+            .mast-meta .wide-only { display: none; }
+        }
+        @media (max-width: 900px) {
+            .app { grid-template-columns: 1fr; }
+            .stage { padding: 0 0 32px; border-right: 0; }
+            .controls { padding: 4px 8px; }
+            .program, .stats, .colophon { margin-left: 16px; margin-right: 16px; }
+            .program { padding-top: 20px; }
+            .chat {
+                position: static; height: 460px;
+                border-top: 1px solid var(--rule);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --mast-h: 52px; }
+            .masthead { padding: 0 16px; }
+            .mast-meta .mid-only { display: none; }
+            .wordmark { font-size: 21px; }
+            .ident { gap: 12px; }
+            .timestamp { top: 10px; left: 12px; font-size: 11px; }
+            .badges { top: 10px; right: 12px; font-size: 9.5px; gap: 8px; }
+            .lower-third { left: 12px; bottom: 38px; }
+            .lt-tag { font-size: 12px; padding: 0 8px; }
+            .lt-body { padding: 4px 10px 5px 9px; }
+            .lt-title { font-size: 16px; }
+            .lt-sub { font-size: 10px; margin-top: 2px; }
+            .bug { display: none; }
+            .breaking { height: 26px; }
+            .breaking .tag { font-size: 12px; }
+            .breaking .crawl { font-size: 12.5px; }
+            .quality-select { display: none; }
+            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .stats > div:not(:nth-child(3n+1)) { padding-left: 0; border-left: 0; }
+            .stats > div:nth-child(even) { padding-left: 14px; border-left: 1px solid var(--rule); }
+            .stats dd { font-size: 15px; }
+            .toasts { left: 12px; right: 12px; bottom: 12px; }
+            .toast { max-width: none; }
+            .stand-by strong { font-size: 24px; }
+            .stand-by { min-width: 0; width: calc(100% - 48px); }
         }
 
-        /* ---- Respect reduced-motion: calm the flicker/scanlines/spin ---- */
+        /* ---- Respect reduced-motion ---- */
         @media (prefers-reduced-motion: reduce) {
             .crt { animation: none; }
-            .live-dot { animation: none; opacity: 0.85; }
+            .live-dot { animation: none; }
             .static.active { animation: none; }
             .breaking .crawl { animation: none; }
             .emote { animation-duration: 2.5s; }
@@ -469,140 +646,182 @@
 <body>
 
     <!-- ========================= COLD OPEN ========================= -->
-    <div class="cold-open" id="coldOpen">
-        <div class="cold-spinner"></div>
-        <div class="cold-text" id="coldText">Connecting to stream…</div>
+    <div class="cold-open" id="coldOpen" aria-hidden="true">
+        <div class="bars-top"></div>
+        <div class="bars-mid"></div>
+        <div class="bars-low"></div>
+        <div class="stand-by">
+            <strong>PLEASE STAND BY</strong>
+            <div class="cold-text" id="coldText">Connecting to stream…</div>
+        </div>
     </div>
+
+    <!-- ========================= MASTHEAD ========================== -->
+    <header class="masthead">
+        <div class="ident">
+            <a class="wordmark" href="/">doofus<span class="tld">.live</span></a>
+            <span class="on-air"><span class="live-dot"></span>ON AIR</span>
+        </div>
+        <div class="mast-meta">
+            <span class="wide-only">CH&nbsp;0 · CONTINUOUS COVERAGE</span>
+            <span class="mid-only">DAY <b id="dayCount">847</b></span>
+            <span id="viewerCount"><b class="value tabular">—</b> watching</span>
+        </div>
+    </header>
 
     <!-- ============================ APP ============================ -->
-    <div class="app">
+    <main class="app">
         <!-- ----------------------- STAGE ------------------------- -->
-        <div class="stage">
-            <div class="player">
+        <section class="stage" aria-label="Broadcast">
 
-                <!-- Header: LIVE + where-from + viewer count -->
-                <div class="player-header">
-                    <div class="header-left">
-                        <div class="live-indicator">
-                            <span class="live-dot"></span>
-                            <span class="live-text">LIVE</span>
-                        </div>
-                        <span class="header-sep">·</span>
-                        <span class="watching-from" id="watchingFrom">watching from —</span>
-                    </div>
-                    <div class="viewer-count" id="viewerCount">
-                        <span class="value">—</span> <span class="label">watching</span>
-                    </div>
+            <!-- Video + all the overlays -->
+            <div class="video">
+                <!--
+                  ============================================================
+                   >>> THE STREAM IMAGE <<<
+                   CONFIG.STREAM_IMAGE_URL is the source of truth; boot()
+                   applies it on load. This src is the progressive-enhancement
+                   fallback shown before JS runs (or if it fails). Swap the
+                   subject in the CONFIG block below, not here.
+                  ============================================================
+                -->
+                <img id="streamImage" class="video-image"
+                     src="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop"
+                     alt="A live broadcast of an empty chair.">
+
+                <div class="crt"></div>
+
+                <div class="timestamp">
+                    <span class="rec-dot">●</span> REC&nbsp;<span id="timestamp">--:--:--</span>
                 </div>
 
-                <!-- Video + all the overlays -->
-                <div class="video">
-                    <!--
-                      ============================================================
-                       >>> THE STREAM IMAGE <<<
-                       CONFIG.STREAM_IMAGE_URL is the source of truth; boot()
-                       applies it on load. This src is the progressive-enhancement
-                       fallback shown before JS runs (or if it fails). Swap the
-                       subject in the CONFIG block below, not here.
-                      ============================================================
-                    -->
-                    <img id="streamImage" class="video-image"
-                         src="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop"
-                         alt="A live broadcast of an empty chair.">
-
-                    <div class="crt"></div>
-
-                    <div class="timestamp">
-                        <span class="rec-dot">●</span> REC&nbsp;<span id="timestamp">--:--:--</span>
-                    </div>
-
-                    <div class="badges">
-                        <span class="badge" id="badgeRes">4K ULTRA</span>
-                        <span class="badge">HDR</span>
-                        <span class="badge">60FPS</span>
-                    </div>
-
-                    <div class="signal" id="signalBars">
-                        <span></span><span></span><span></span><span></span>
-                    </div>
-
-                    <div class="chyron">
-                        <span class="accent">LIVE</span> · <span id="chyronText">An unremarkable room</span>
-                    </div>
-
-                    <!-- Hidden-until-triggered overlays -->
-                    <div class="buffering" id="buffering">
-                        <div class="spinner"></div>
-                        <div>Buffering…</div>
-                    </div>
-
-                    <div class="static" id="staticBurst">
-                        <div class="static-label">SIGNAL LOST — RECONNECTING</div>
-                    </div>
-
-                    <div class="breaking" id="breaking">
-                        <span class="tag">BREAKING</span>
-                        <span class="crawl" id="breakingText"></span>
-                    </div>
-
-                    <div class="raid" id="raid"></div>
-
-                    <div class="idle-veil" id="idleVeil">
-                        <h2>Are you still watching?</h2>
-                        <p>The stream has detected no signs of life. Neither have we.</p>
-                        <button class="idle-btn" id="idleBtn">Continue watching</button>
-                    </div>
-
-                    <div class="emote-layer" id="emoteLayer"></div>
+                <div class="badges" aria-hidden="true">
+                    <span id="badgeRes">2160p</span>
+                    <span>HDR</span>
+                    <span>60fps</span>
+                    <span class="signal" id="signalBars"><span></span><span></span><span></span><span></span></span>
                 </div>
 
-                <!-- Controls: inert except volume + fullscreen -->
-                <div class="controls">
-                    <div class="ctrl" title="It's live. There is no pause.">❚❚</div>
-                    <div class="ctrl live-clickable" id="volumeBtn"
-                         title="Unmute the room tone (it's a refrigerator)">🔇</div>
-                    <div class="progress" title="You cannot rewind real life."></div>
-                    <span class="live-pill">LIVE</span>
-                    <select class="quality-select" id="qualitySelect" title="Resolution">
-                        <option>8K</option>
-                        <option>4K UHD</option>
-                        <option>1080p60</option>
-                        <option>480p</option>
-                        <option selected>Chair (native)</option>
-                    </select>
-                    <div class="ctrl live-clickable" id="shareBtn" title="Share this moment">⤴</div>
-                    <div class="ctrl live-clickable" id="fullscreenBtn" title="Fullscreen">⛶</div>
+                <div class="lower-third" aria-live="off">
+                    <span class="lt-tag">LIVE</span>
+                    <span class="lt-body">
+                        <span class="lt-title">The Chair</span>
+                        <span class="lt-sub" id="chyronText">An unremarkable room</span>
+                    </span>
                 </div>
 
-                <!-- Footer stat strip -->
-                <div class="stats">
-                    <span>peak today <b id="statPeak">—</b></span>
-                    <span>uptime <b id="statUptime">—</b></span>
-                    <span>bitrate <b id="statBitrate">0.0 kbps</b></span>
-                    <span>dropped frames <b id="statDropped">0</b></span>
-                    <span>watch time <b id="statWatch">00:00:00</b></span>
-                    <span><b id="statTalking">0</b> people are talking about this</span>
+                <div class="bug" aria-hidden="true">doofus</div>
+
+                <!-- Hidden-until-triggered overlays -->
+                <div class="buffering" id="buffering">
+                    <div class="spinner"></div>
+                    <div>BUFFERING</div>
                 </div>
+
+                <div class="static" id="staticBurst">
+                    <div class="static-label"><span>SIGNAL LOST — RECONNECTING</span></div>
+                </div>
+
+                <div class="breaking" id="breaking">
+                    <span class="tag">BREAKING</span>
+                    <span class="crawl" id="breakingText"></span>
+                </div>
+
+                <div class="raid" id="raid" role="status"></div>
+
+                <div class="idle-veil" id="idleVeil">
+                    <h2>Are you still watching?</h2>
+                    <p>The stream has detected no signs of life. Neither have we.</p>
+                    <button class="idle-btn" id="idleBtn" type="button">Continue watching</button>
+                </div>
+
+                <div class="emote-layer" id="emoteLayer"></div>
             </div>
 
-        </div>
+            <!-- Transport: inert except volume, share, fullscreen -->
+            <div class="controls">
+                <button class="ctrl" type="button" aria-disabled="true"
+                        title="It's live. There is no pause." aria-label="Pause (unavailable)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+                </button>
+                <button class="ctrl live-clickable" id="volumeBtn" type="button"
+                        aria-pressed="false" aria-label="Unmute room tone"
+                        title="Unmute the room tone (it's a refrigerator)">
+                    <svg class="ic-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5h4l5-4v13l-5-4H3z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+                    <svg class="ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5h4l5-4v13l-5-4H3z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+                </button>
+                <div class="progress" title="You cannot rewind real life." role="presentation"></div>
+                <span class="live-pill">LIVE</span>
+                <select class="quality-select" id="qualitySelect" title="Resolution" aria-label="Resolution">
+                    <option>8K</option>
+                    <option>4K UHD</option>
+                    <option>1080p60</option>
+                    <option>480p</option>
+                    <option selected>Chair (native)</option>
+                </select>
+                <button class="ctrl live-clickable" id="shareBtn" type="button"
+                        title="Share this moment" aria-label="Copy share text">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 13v7h14v-7"/></svg>
+                </button>
+                <button class="ctrl live-clickable" id="fullscreenBtn" type="button"
+                        title="Fullscreen" aria-label="Fullscreen">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+                </button>
+            </div>
+
+            <!-- What's on -->
+            <div class="program">
+                <div class="eyebrow">Live now · Channel 0</div>
+                <h1>An Empty Chair</h1>
+                <div class="program-meta">
+                    <span id="watchingFrom">watching from —</span>
+                    <span>Unscripted</span>
+                    <span>Rated G for Guaranteed nothing</span>
+                </div>
+                <p class="program-desc">
+                    One camera. One chair. No one has sat in it since the broadcast began,
+                    and there are no plans for anyone to. If that changes, <em>you will be the first to know</em>.
+                    It will not change.
+                </p>
+            </div>
+
+            <!-- Engineering readout -->
+            <dl class="stats">
+                <div><dt>Peak today</dt><dd id="statPeak">—</dd></div>
+                <div><dt>Uptime</dt><dd id="statUptime">—</dd></div>
+                <div><dt>Bitrate</dt><dd id="statBitrate">0.0 kbps</dd></div>
+                <div><dt>Dropped frames</dt><dd id="statDropped">0</dd></div>
+                <div><dt>Your watch time</dt><dd id="statWatch">00:00:00</dd></div>
+                <div><dt>Talking about this</dt><dd id="statTalking">0</dd></div>
+            </dl>
+
+            <p class="colophon">
+                doofus.live is a continuous broadcast of an empty chair.
+                Nothing has happened. Nothing is scheduled to happen.
+                Programming may be interrupted without notice, and then resume exactly as before.
+            </p>
+        </section>
 
         <!-- ----------------------- CHAT -------------------------- -->
-        <div class="chat">
+        <aside class="chat" aria-label="Live chat">
             <div class="chat-header">
-                <span class="title">STREAM CHAT</span>
-                <span id="chatCount">—</span>
+                <span class="title">Live chat</span>
+                <span class="count"><span id="chatCount">—</span> chatting</span>
             </div>
-            <div class="chat-body" id="chatBody"></div>
+            <div class="chat-pinned">
+                <b>Pinned by mods</b>
+                Please do not ask when something is going to happen.
+            </div>
+            <div class="chat-body" id="chatBody" role="log" aria-live="off"></div>
             <div class="chat-input">
-                <input type="text" placeholder="Chat is in subscriber-only mode" disabled>
-                <button disabled>Chat</button>
+                <input type="text" placeholder="Chat is in subscriber-only mode" aria-label="Chat message" disabled>
+                <button type="button" disabled>Send</button>
             </div>
-        </div>
-    </div>
+        </aside>
+    </main>
 
     <!-- Toast container -->
-    <div class="toasts" id="toasts"></div>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
 
     <script>
     /* ========================================================================
@@ -618,14 +837,14 @@
         // styled to match the room. boot() swaps it in on image error.
         FALLBACK_IMAGE: "data:image/svg+xml;utf8," + encodeURIComponent(
             `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
-                <rect width="1280" height="720" fill="#0b0d10"/>
-                <g stroke="#3a3f47" stroke-width="12" stroke-linecap="round" fill="none">
+                <rect width="1280" height="720" fill="#161512"/>
+                <g stroke="#625e55" stroke-width="12" stroke-linecap="round" fill="none">
                     <path d="M565 250 L565 432"/><path d="M715 250 L715 432"/>
                     <path d="M565 286 L715 286"/><path d="M565 330 L715 330"/>
                     <path d="M540 432 L742 432"/>
                     <path d="M560 432 L560 562"/><path d="M722 432 L722 562"/>
                 </g>
-                <text x="640" y="652" fill="#474d56" font-family="monospace"
+                <text x="640" y="652" fill="#625e55" font-family="monospace"
                       font-size="24" text-anchor="middle" letter-spacing="3">CHAIR · NATIVE</text>
             </svg>`
         ),
@@ -1036,7 +1255,6 @@
             row.className = "msg";
             row.innerHTML =
                 `<span class="user" style="color:${userColor(user)}">${user}</span>` +
-                `<span style="color:var(--text-dimmer)">: </span>` +
                 `<span class="text">${escapeHtml(text)}</span>`;
             this.addRow(row);
         },
@@ -1046,7 +1264,7 @@
             const row = document.createElement("div");
             row.className = "msg super";
             row.innerHTML =
-                `<span class="user">${user}</span> donated <b>${s.amt}</b><br>` +
+                `<span class="user">${user}</span><b>${s.amt}</b>` +
                 `<span class="text">${escapeHtml(s.text)}</span>`;
             this.addRow(row);
         },
@@ -1069,11 +1287,12 @@
         },
     };
 
-    // Stable per-user color so names look consistent (muted palette).
+    // Stable per-user color from a hand-picked palette (no rainbow HSL).
+    const NAME_COLORS = ["#d9a35f", "#8fb7a4", "#c98c8c", "#a7a2d6", "#cbbf72", "#7fa9c9", "#d08fb8", "#9fbf7a"];
     function userColor(user) {
         let h = 0;
-        for (let i = 0; i < user.length; i++) h = (h * 31 + user.charCodeAt(i)) % 360;
-        return `hsl(${h}, 30%, 62%)`;
+        for (let i = 0; i < user.length; i++) h = (h * 31 + user.charCodeAt(i)) >>> 0;
+        return NAME_COLORS[h % NAME_COLORS.length];
     }
     function escapeHtml(s) {
         return s.replace(/[&<>"']/g, (c) => (
@@ -1177,9 +1396,9 @@
             const c = document.createElement("canvas");
             c.width = c.height = 32;
             const x = c.getContext("2d");
-            x.fillStyle = "#0b0d10"; x.fillRect(0, 0, 32, 32);
+            x.fillStyle = "#0e0d0b"; x.fillRect(0, 0, 32, 32);
             x.beginPath(); x.arc(16, 16, 8, 0, Math.PI * 2);
-            x.fillStyle = "#d83a3a"; x.fill();
+            x.fillStyle = "#e0301e"; x.fill();
             const link = document.createElement("link");
             link.rel = "icon"; link.href = c.toDataURL("image/png");
             document.head.appendChild(link);
@@ -1219,13 +1438,17 @@
                     this.nodes.push(osc, gain);
                 });
                 this.audioOn = true;
-                btn.textContent = "🔊";
+                btn.classList.add("is-on");
+                btn.setAttribute("aria-pressed", "true");
+                btn.setAttribute("aria-label", "Mute room tone");
                 Toasts.show({ t: "AUDIO", m: "Room tone enabled. That is a refrigerator." });
             } else {
                 this.nodes.forEach((n) => n.stop && n.stop());
                 if (this.audioCtx) this.audioCtx.close();
                 this.audioCtx = null; this.audioOn = false;
-                btn.textContent = "🔇";
+                btn.classList.remove("is-on");
+                btn.setAttribute("aria-pressed", "false");
+                btn.setAttribute("aria-label", "Unmute room tone");
             }
         },
 
@@ -1331,6 +1554,7 @@
         const img = $("streamImage");
         img.onerror = () => { img.onerror = null; img.src = CONFIG.FALLBACK_IMAGE; };
         img.src = CONFIG.STREAM_IMAGE_URL;
+        $("dayCount").textContent = CONFIG.uptimeStartDaysAgo.toLocaleString();
 
         ViewerCounter.init();
         StreamClock.init();
