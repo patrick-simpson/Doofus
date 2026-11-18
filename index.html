@@ -88,7 +88,6 @@
             display: flex; align-items: center; justify-content: space-between;
             gap: 20px;
             padding: 0 28px;
-            border-bottom: 1px solid var(--rule);
         }
         .ident { display: flex; align-items: center; gap: 18px; }
         .wordmark {
@@ -98,27 +97,27 @@
         }
         .wordmark .tld { color: var(--paper-faint); font-weight: 500; letter-spacing: -0.01em; }
 
-        /* A physical "ON AIR" sign, not a glowing dot */
+        /* A lit "ON AIR" sign, like the one over a studio door */
         .on-air {
-            display: inline-flex; align-items: center; gap: 7px;
-            font-family: var(--mono); font-weight: 600;
-            font-size: 10.5px; letter-spacing: 0.16em;
-            color: var(--red);
-            border: 1.5px solid var(--red);
-            padding: 3px 8px 3px 7px;
+            display: inline-flex; align-items: center;
+            background: var(--red); color: #fff;
+            font-weight: 850; font-stretch: 78%;
+            font-size: 13px; letter-spacing: 0.05em; line-height: 1;
+            padding: 5px 8px 4px;
         }
         .live-dot {
-            width: 7px; height: 7px; background: var(--red); border-radius: 50%;
-            animation: pulse 2s steps(2, jump-none) infinite;
+            display: inline-block; width: 7px; height: 7px; margin-right: 6px;
+            background: var(--red); border-radius: 50%;
         }
-        @keyframes pulse { 50% { opacity: 0.25; } }
 
         .mast-meta {
-            display: flex; align-items: center; gap: 22px;
-            font-family: var(--mono); font-size: 12px; color: var(--paper-dim);
+            display: flex; align-items: center; gap: 20px;
+            font-size: 14px; color: var(--paper-dim);
             white-space: nowrap;
         }
-        .mast-meta b { color: var(--paper); font-weight: 500; }
+        .mast-meta b { color: var(--paper); font-weight: 600; font-variant-numeric: tabular-nums; }
+        .mast-meta .live-dot { animation: pulse 2s steps(2, jump-none) infinite; }
+        @keyframes pulse { 50% { opacity: 0.25; } }
 
         /* ====================================================================
            LAYOUT — broadcast monitor on the left, chat rail on the right
@@ -129,8 +128,7 @@
             min-height: calc(100vh - var(--mast-h));
         }
         .stage {
-            padding: 24px 32px 48px;
-            border-right: 1px solid var(--rule);
+            padding: 8px 32px 48px;
             min-width: 0;
         }
 
@@ -354,7 +352,6 @@
         .controls {
             display: flex; align-items: center; gap: 4px;
             padding: 8px 0;
-            border-bottom: 1px solid var(--rule);
         }
         .ctrl {
             width: 36px; height: 36px; flex: none;
@@ -393,61 +390,56 @@
         }
 
         /* ====================================================================
-           PROGRAM INFO — what's on
+           GUIDE BANNER: modeled on a cable box's "info" screen
            ==================================================================== */
-        .program { padding-top: 26px; }
-        .eyebrow {
-            font-family: var(--mono); font-size: 11.5px; font-weight: 500;
-            letter-spacing: 0.14em; text-transform: uppercase;
-            color: var(--red);
+        .guide {
+            display: grid; grid-template-columns: auto minmax(0, 1fr);
+            gap: 0 24px; padding-top: 28px;
         }
-        .program h1 {
-            margin-top: 8px;
-            font-weight: 800; font-stretch: 70%;
-            font-size: clamp(38px, 4.6vw, 64px);
-            line-height: 0.92; letter-spacing: -0.01em;
+        .guide-ch {
+            align-self: start;
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 84px; padding: 10px 14px 11px;
+            background: var(--ink-2);
         }
-        .program-meta {
-            margin-top: 14px;
-            display: flex; flex-wrap: wrap; gap: 4px 22px;
-            font-size: 14px; color: var(--paper-dim);
+        .ch-num { font-weight: 850; font-stretch: 70%; font-size: 58px; line-height: 0.9; }
+        .ch-call { margin-top: 5px; font-weight: 700; font-size: 12px; color: var(--paper-dim); }
+        .guide-slot { font-size: 14px; color: var(--paper-dim); }
+        .guide-slot .on-now { color: var(--red); font-weight: 700; margin-right: 8px; }
+        .guide h1 {
+            margin-top: 2px;
+            font-weight: 800; font-stretch: 72%;
+            font-size: clamp(36px, 4.2vw, 56px);
+            line-height: 0.95; letter-spacing: -0.01em;
         }
-        .program-meta b { color: var(--paper); font-weight: 600; }
-        .program-desc {
-            margin-top: 16px; max-width: 60ch;
-            font-size: 15.5px; line-height: 1.55; color: var(--paper-dim);
+        .listing {
+            margin-top: 12px; max-width: 62ch;
+            font-size: 15.5px; line-height: 1.55;
         }
-        .program-desc em { color: var(--paper); font-style: normal; }
+        .listing .tags { margin-left: 4px; color: var(--paper-faint); white-space: nowrap; }
+        .viewer-line { margin-top: 10px; max-width: 62ch; font-size: 14px; color: var(--paper-dim); }
+        .viewer-line b { color: var(--paper); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-        /* ====================================================================
-           TELEMETRY — an engineering readout, not a stat strip
-           ==================================================================== */
-        .stats {
-            margin-top: 30px;
-            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-            border-top: 1px solid var(--rule);
-        }
-        .stats > div {
-            padding: 14px 16px 14px 0;
-            border-bottom: 1px solid var(--rule);
-        }
-        .stats > div:not(:nth-child(3n+1)) { padding-left: 16px; border-left: 1px solid var(--rule); }
-        .stats dt {
-            font-family: var(--mono); font-size: 10.5px; font-weight: 500;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            color: var(--paper-faint);
-        }
-        .stats dd {
-            margin-top: 4px;
-            font-family: var(--mono); font-size: 17px; font-weight: 500;
-            font-variant-numeric: tabular-nums; color: var(--paper);
-        }
+        .site-foot { margin-top: 44px; font-size: 13px; color: var(--paper-faint); }
 
-        .colophon {
-            margin-top: 28px;
+        /* Stats for nerds: the engineering readout lives on the picture */
+        .nerds {
+            position: absolute; top: 42px; left: 18px;
+            padding: 8px 32px 9px 10px;
+            background: rgba(0,0,0,0.72);
             font-family: var(--mono); font-size: 11px; line-height: 1.6;
-            color: var(--paper-faint); max-width: 70ch;
+            color: #e8e8e8;
         }
+        .nerds[hidden] { display: none; }
+        .nerds dl { display: grid; grid-template-columns: auto auto; gap: 0 10px; }
+        .nerds dt { text-align: right; color: #a3a3a3; }
+        .nerds dd { font-variant-numeric: tabular-nums; }
+        .nerds-close {
+            position: absolute; top: 3px; right: 4px; padding: 4px;
+            background: none; border: 0; color: #bdbdbd; cursor: pointer;
+            font-family: var(--mono); font-size: 11px; line-height: 1;
+        }
+        #nerdsBtn[aria-pressed="true"] { background: var(--ink-3); }
 
         /* ====================================================================
            CHAT RAIL
@@ -462,22 +454,20 @@
             height: 52px; flex: none;
             padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--rule);
         }
         .chat-header .title { font-weight: 700; font-size: 14px; }
-        .chat-header .count { font-family: var(--mono); font-size: 11.5px; color: var(--paper-faint); }
+        .chat-header .count { font-size: 13px; color: var(--paper-faint); font-variant-numeric: tabular-nums; }
         .chat-pinned {
-            flex: none;
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--rule);
+            flex: none; display: flex; gap: 9px;
+            margin: 0 12px; padding: 10px 12px;
+            background: var(--ink-3);
             font-size: 13px; line-height: 1.45; color: var(--paper-dim);
         }
-        .chat-pinned b {
-            display: block;
-            font-family: var(--mono); font-size: 10.5px; font-weight: 500;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            color: var(--paper-faint); margin-bottom: 3px;
+        .chat-pinned .pin {
+            width: 14px; height: 14px; flex: none; margin-top: 2px;
+            fill: none; stroke: var(--paper-faint); stroke-width: 1.75;
         }
+        .chat-pinned .user { color: var(--paper); font-weight: 650; margin-right: 6px; }
         .chat-body {
             flex: 1 1 auto; overflow-y: auto;
             padding: 14px 20px;
@@ -489,7 +479,7 @@
         .msg .user { font-weight: 650; margin-right: 6px; }
         .msg .text { color: var(--paper); }
         .msg.system {
-            font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
+            font-size: 12.5px; font-style: italic; line-height: 1.45;
             color: var(--paper-faint);
         }
         .msg.super {
@@ -505,8 +495,7 @@
         .msg.super .text { display: block; margin-top: 4px; color: var(--paper-dim); }
         .chat-input {
             flex: none;
-            display: flex; gap: 8px; padding: 14px 20px 18px;
-            border-top: 1px solid var(--rule);
+            display: flex; gap: 8px; padding: 12px 20px 18px;
         }
         .chat-input input {
             flex: 1 1 auto; min-width: 0;
@@ -539,9 +528,10 @@
             animation: toastIn 0.25s ease, toastOut 0.4s ease 4.4s forwards;
         }
         .toast .toast-title {
-            font-family: var(--mono); font-size: 10px; font-weight: 600;
-            letter-spacing: 0.14em; color: #6d6860; margin-bottom: 2px;
+            font-size: 12px; font-weight: 700; color: #77726a;
+            text-transform: lowercase; margin-bottom: 1px;
         }
+        .toast .toast-title::first-letter { text-transform: uppercase; }
         @keyframes toastIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
         @keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
 
@@ -591,18 +581,14 @@
         /* ====================================================================
            RESPONSIVE
            ==================================================================== */
-        @media (max-width: 1100px) {
-            .mast-meta .wide-only { display: none; }
-        }
         @media (max-width: 900px) {
             .app { grid-template-columns: 1fr; }
-            .stage { padding: 0 0 32px; border-right: 0; }
+            .stage { padding: 0 0 32px; }
             .controls { padding: 4px 8px; }
-            .program, .stats, .colophon { margin-left: 16px; margin-right: 16px; }
-            .program { padding-top: 20px; }
+            .guide, .site-foot { margin-left: 16px; margin-right: 16px; }
+            .guide { padding-top: 20px; }
             .chat {
                 position: static; height: 460px;
-                border-top: 1px solid var(--rule);
             }
         }
         @media (max-width: 600px) {
@@ -623,10 +609,10 @@
             .breaking .tag { font-size: 12px; }
             .breaking .crawl { font-size: 12.5px; }
             .quality-select { display: none; }
-            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .stats > div:not(:nth-child(3n+1)) { padding-left: 0; border-left: 0; }
-            .stats > div:nth-child(even) { padding-left: 14px; border-left: 1px solid var(--rule); }
-            .stats dd { font-size: 15px; }
+            .guide { gap: 0 14px; }
+            .guide-ch { min-width: 58px; padding: 8px 10px 9px; }
+            .ch-num { font-size: 40px; }
+            .nerds { top: 32px; left: 12px; font-size: 10px; }
             .toasts { left: 12px; right: 12px; bottom: 12px; }
             .toast { max-width: none; }
             .stand-by strong { font-size: 24px; }
@@ -636,7 +622,7 @@
         /* ---- Respect reduced-motion ---- */
         @media (prefers-reduced-motion: reduce) {
             .crt { animation: none; }
-            .live-dot { animation: none; }
+            .mast-meta .live-dot { animation: none; }
             .static.active { animation: none; }
             .breaking .crawl { animation: none; }
             .emote { animation-duration: 2.5s; }
@@ -660,12 +646,11 @@
     <header class="masthead">
         <div class="ident">
             <a class="wordmark" href="/">doofus<span class="tld">.live</span></a>
-            <span class="on-air"><span class="live-dot"></span>ON AIR</span>
+            <span class="on-air">ON AIR</span>
         </div>
         <div class="mast-meta">
-            <span class="wide-only">CH&nbsp;0 · CONTINUOUS COVERAGE</span>
-            <span class="mid-only">DAY <b id="dayCount">847</b></span>
-            <span id="viewerCount"><b class="value tabular">—</b> watching</span>
+            <span class="mid-only">Day <b id="dayCount">847</b></span>
+            <span id="viewerCount"><span class="live-dot"></span><b class="value">—</b> watching</span>
         </div>
     </header>
 
@@ -702,6 +687,19 @@
                     <span class="signal" id="signalBars"><span></span><span></span><span></span><span></span></span>
                 </div>
 
+                <div class="nerds" id="nerds" hidden>
+                    <button class="nerds-close" id="nerdsClose" type="button" aria-label="Close stats">[X]</button>
+                    <dl>
+                        <dt>Video ID</dt><dd>chair-0000001</dd>
+                        <dt>Frames</dt><dd><span id="statDropped">0</span> dropped of 1</dd>
+                        <dt>Current / Optimal Res</dt><dd>Chair / Chair</dd>
+                        <dt>Connection Speed</dt><dd id="statBitrate">0.0 kbps</dd>
+                        <dt>Uptime</dt><dd id="statUptime">—</dd>
+                        <dt>Peak Viewers</dt><dd id="statPeak">—</dd>
+                        <dt>Codecs</dt><dd>furniture.1 / none</dd>
+                    </dl>
+                </div>
+
                 <div class="lower-third" aria-live="off">
                     <span class="lt-tag">LIVE</span>
                     <span class="lt-body">
@@ -715,7 +713,6 @@
                 <!-- Hidden-until-triggered overlays -->
                 <div class="buffering" id="buffering">
                     <div class="spinner"></div>
-                    <div>BUFFERING</div>
                 </div>
 
                 <div class="static" id="staticBurst">
@@ -759,6 +756,11 @@
                     <option>480p</option>
                     <option selected>Chair (native)</option>
                 </select>
+                <button class="ctrl live-clickable" id="nerdsBtn" type="button"
+                        aria-pressed="false" aria-controls="nerds"
+                        title="Stats for nerds" aria-label="Stats for nerds">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 10.5V17M12 7v1.5"/></svg>
+                </button>
                 <button class="ctrl live-clickable" id="shareBtn" type="button"
                         title="Share this moment" aria-label="Copy share text">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M5 13v7h14v-7"/></svg>
@@ -769,37 +771,28 @@
                 </button>
             </div>
 
-            <!-- What's on -->
-            <div class="program">
-                <div class="eyebrow">Live now · Channel 0</div>
-                <h1>An Empty Chair</h1>
-                <div class="program-meta">
-                    <span id="watchingFrom">watching from —</span>
-                    <span>Unscripted</span>
-                    <span>Rated G for Guaranteed nothing</span>
+            <!-- Program guide info banner -->
+            <div class="guide">
+                <div class="guide-ch" aria-label="Channel 0, DFS">
+                    <span class="ch-num">0</span>
+                    <span class="ch-call">DFS</span>
                 </div>
-                <p class="program-desc">
-                    One camera. One chair. No one has sat in it since the broadcast began,
-                    and there are no plans for anyone to. If that changes, <em>you will be the first to know</em>.
-                    It will not change.
-                </p>
+                <div>
+                    <p class="guide-slot"><span class="on-now">On now</span>Since <span id="startedOn">2024</span>. No end time listed.</p>
+                    <h1>The Chair</h1>
+                    <p class="listing">
+                        Continuing coverage of a wooden chair in a spare room. Nobody is expected
+                        to sit in it. Viewers joining late have not missed anything.
+                        <span class="tags">(CC) (HD) (NR)</span>
+                    </p>
+                    <p class="viewer-line">
+                        You’re watching from <span id="watchingFrom">—</span>, and have been for
+                        <b id="statWatch">00:00:00</b>. <b id="statTalking">0</b> people are talking about this.
+                    </p>
+                </div>
             </div>
 
-            <!-- Engineering readout -->
-            <dl class="stats">
-                <div><dt>Peak today</dt><dd id="statPeak">—</dd></div>
-                <div><dt>Uptime</dt><dd id="statUptime">—</dd></div>
-                <div><dt>Bitrate</dt><dd id="statBitrate">0.0 kbps</dd></div>
-                <div><dt>Dropped frames</dt><dd id="statDropped">0</dd></div>
-                <div><dt>Your watch time</dt><dd id="statWatch">00:00:00</dd></div>
-                <div><dt>Talking about this</dt><dd id="statTalking">0</dd></div>
-            </dl>
-
-            <p class="colophon">
-                doofus.live is a continuous broadcast of an empty chair.
-                Nothing has happened. Nothing is scheduled to happen.
-                Programming may be interrupted without notice, and then resume exactly as before.
-            </p>
+            <p class="site-foot">Please do not adjust your set.</p>
         </section>
 
         <!-- ----------------------- CHAT -------------------------- -->
@@ -809,8 +802,8 @@
                 <span class="count"><span id="chatCount">—</span> chatting</span>
             </div>
             <div class="chat-pinned">
-                <b>Pinned by mods</b>
-                Please do not ask when something is going to happen.
+                <svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9"/></svg>
+                <p><span class="user">mods</span>please do not ask when something is going to happen</p>
             </div>
             <div class="chat-body" id="chatBody" role="log" aria-live="off"></div>
             <div class="chat-input">
@@ -1326,7 +1319,7 @@
         },
         rotateLabels() {
             this.chyron.textContent = pick(CHYRON_PLACES);
-            this.watchingFrom.textContent = "watching from " + pick(WATCH_REGIONS);
+            this.watchingFrom.textContent = pick(WATCH_REGIONS).replace(/\p{Regional_Indicator}/gu, "").trim();
         },
         // "Buffer" for ~2s and reveal the identical frame.
         buffer() {
@@ -1417,6 +1410,15 @@
             $("volumeBtn").addEventListener("click", () => this.toggleAudio());
             $("fullscreenBtn").addEventListener("click", () => this.toggleFullscreen());
             $("shareBtn").addEventListener("click", () => this.share());
+            // Stats for nerds: open by default where there's room for it.
+            const nerdsBtn = $("nerdsBtn");
+            const setNerds = (open) => {
+                $("nerds").hidden = !open;
+                nerdsBtn.setAttribute("aria-pressed", String(open));
+            };
+            setNerds(window.matchMedia("(min-width: 900px)").matches);
+            nerdsBtn.addEventListener("click", () => setNerds($("nerds").hidden));
+            $("nerdsClose").addEventListener("click", () => setNerds(false));
         },
 
         // Generate a low refrigerator-ish hum with WebAudio — no audio file needed.
@@ -1555,6 +1557,8 @@
         img.onerror = () => { img.onerror = null; img.src = CONFIG.FALLBACK_IMAGE; };
         img.src = CONFIG.STREAM_IMAGE_URL;
         $("dayCount").textContent = CONFIG.uptimeStartDaysAgo.toLocaleString();
+        $("startedOn").textContent = new Date(StreamClock.startedAt)
+            .toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
         ViewerCounter.init();
         StreamClock.init();
