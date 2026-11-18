@@ -16,14 +16,15 @@
     <meta property="og:site_name" content="doofus.live">
     <meta property="og:title" content="● LIVE — an empty chair">
     <meta property="og:description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop">
+    <meta property="og:image" content="https://doofus.live/og-image.jpg">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="● LIVE — an empty chair">
     <meta name="twitter:description" content="A live 24/7 broadcast of an empty chair. Nothing ever happens.">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop">
+    <meta name="twitter:image" content="https://doofus.live/og-image.jpg">
 
-    <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -169,7 +170,7 @@
             position: absolute; top: 16px; left: 18px;
             font-family: var(--mono); font-size: 13px; font-weight: 500;
             color: rgba(255,255,255,0.88);
-            text-shadow: 0 1px 0 rgba(0,0,0,0.7);
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 rgba(0,0,0,0.6), 1px -1px 0 rgba(0,0,0,0.6), -1px 1px 0 rgba(0,0,0,0.6);
             font-variant-numeric: tabular-nums;
             pointer-events: none;
         }
@@ -182,7 +183,7 @@
             font-family: var(--mono); font-size: 11px; font-weight: 500;
             letter-spacing: 0.06em;
             color: rgba(255,255,255,0.8);
-            text-shadow: 0 1px 0 rgba(0,0,0,0.7);
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 rgba(0,0,0,0.6), 1px -1px 0 rgba(0,0,0,0.6), -1px 1px 0 rgba(0,0,0,0.6);
             pointer-events: none;
         }
         .signal { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
@@ -671,7 +672,7 @@
                   ============================================================
                 -->
                 <img id="streamImage" class="video-image"
-                     src="https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop"
+                     src="chair.svg"
                      alt="A live broadcast of an empty chair.">
 
                 <div class="crt"></div>
@@ -823,7 +824,7 @@
        ======================================================================== */
     const CONFIG = {
         // >>> The one line most people will want to change: <<<
-        STREAM_IMAGE_URL: "https://images.unsplash.com/photo-1503602642458-232111445657?w=1280&h=720&fit=crop",
+        STREAM_IMAGE_URL: "chair.svg",   // drawn by tools/make_chair.py
 
         // If the image above ever 404s or rate-limits, the joke must not die.
         // This inline SVG chair is the last line of defense — zero network,

@@ -28,8 +28,20 @@ copy arrays:
   and the **favicon** is drawn on a `<canvas>` at runtime — so there are no
   asset files to manage.
 
-The stream image is a single URL. If it ever fails to load, an inline SVG chair
-takes over so the joke can't break.
+The stream image is [`chair.svg`](./chair.svg), a wooden chair in a spare room
+seen from a fixed, slightly elevated camera. It isn't hand-drawn: it's built
+by [`tools/make_chair.py`](./tools/make_chair.py), which models the chair as a
+few 3D boxes, projects them through a pinhole camera, shades each face from a
+single window light, and casts the shadow onto the floor. To move the camera,
+change the wood, or swap the light, edit the constants at the top and run:
+
+```sh
+python3 tools/make_chair.py > chair.svg
+```
+
+`og-image.jpg` is a raster render of the same frame for link previews (most
+social sites won't unfurl an SVG). If `chair.svg` ever fails to load, an inline
+SVG chair in the script takes over so the joke can't break.
 
 ## Running it
 
